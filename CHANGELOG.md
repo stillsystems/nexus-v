@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-04-22
+### Fixed
+- Cleaned up template "bloat": variants like `theme` and `language` no longer include unwanted `src/` boilerplate from the default template.
+- Fixed broken installation URL in `install.ps1`.
+- Filtered internal implementation templates (`default`, `.vscode`) from the `list` command output.
+### Changed
+- Standardized README examples to use `./nexus-v` for easier local execution and copy-paste.
+- Improved TUI variant selection to be dynamic based on available templates.
+- Simplified `dist` binary naming for better ease of use.
+### Added
+- Local directory support for the `list` command (`--template-dir <path>`).
+
 ## [0.2.0] - 2026-04-22
 ### Added
 - Remote template variant discovery (`nexus-v list --template-dir <URL>`)
