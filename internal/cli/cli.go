@@ -8,6 +8,7 @@ import (
 	"runtime"
 
 	"nexus-v/internal/config"
+	"nexus-v/internal/doctor"
 	"nexus-v/internal/git"
 	"nexus-v/internal/hooks"
 	"nexus-v/internal/prompts"
@@ -36,6 +37,8 @@ func Run() {
 			Error("Update failed: " + err.Error())
 			os.Exit(1)
 		}
+	case "doctor", "dr":
+		doctor.RunChecks()
 	case "help", "-h", "--help":
 		printUsage()
 	default:
@@ -52,6 +55,7 @@ func printUsage() {
 	fmt.Println("  variants  List available template variants")
 	fmt.Println("  version   Print version information")
 	fmt.Println("  update    Update nexus-v to the latest version")
+	fmt.Println("  doctor    Check environment for required tools")
 }
 
 func runVariants() {

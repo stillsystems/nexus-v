@@ -10,9 +10,11 @@ if [[ "$(uname -m)" == "arm64" || "$(uname -m)" == "aarch64" ]]; then
     ARCH="arm64"
 fi
 
-# Download binary
-URL="https://github.com/billy-kidd-dev/nexus-v/releases/latest/download/nexus-v-${OS}-${ARCH}"
-curl -L "$URL" -o nexus-v
+# Download and extract binary
+URL="https://github.com/billy-kidd-dev/nexus-v/releases/latest/download/nexus-v_${OS}_${ARCH}.tar.gz"
+curl -L "$URL" -o nexus-v.tar.gz
+tar -xzf nexus-v.tar.gz nexus-v
+rm nexus-v.tar.gz
 
 # Make executable and move to bin
 chmod +x nexus-v

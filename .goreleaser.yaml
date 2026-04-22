@@ -8,7 +8,8 @@ before:
     - go mod tidy
 
 builds:
-  - env:
+  - id: archive
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
@@ -20,8 +21,23 @@ builds:
     main: ./cmd
     binary: nexus-v
 
+  - id: raw
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    main: ./cmd
+    binary: nexus-v-{{ .Os }}-{{ .Arch }}
+
 archives:
-  - format: tar.gz
+  - builds:
+      - archive
+    format: tar.gz
     # use zip for windows archives
     format_overrides:
       - goos: windows
@@ -65,5 +81,31 @@ scoops:
     homepage: "https://github.com/billy-kidd-dev/nexus-v"
     description: "A modern, zero-install VS Code extension scaffolder."
     license: "MIT"
+
+winget:
+  - name: nexus-v
+    publisher: Billy Kidd
+    package_identifier: BillyKidd.NexusV
+    short_description: "A modern, zero-install VS Code extension scaffolder."
+    description: "NEXUS-V replaces the legacy Yeoman generator with a single static binary that produces clean VS Code extension projects."
+    license: MIT
+    homepage: "https://github.com/billy-kidd-dev/nexus-v"
+    publisher_url: "https://github.com/billy-kidd-dev"
+    tags:
+      - vscode
+      - extension
+      - yeoman
+      - scaffolder
+    repository:
+      owner: billy-kidd-dev
+      name: winget-nexusv
+    # Only use the Windows amd64 archive
+    ids:
+      - archive
+    goos:
+      - windows
+    goarch:
+      - amd64
+
 
 

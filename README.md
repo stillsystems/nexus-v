@@ -140,6 +140,12 @@ nexus-v variants  # or: nexus-v ls / nexus-v vars
 nexus-v update  # or: nexus-v u
 ```
 
+### Check Environment
+
+```bash
+nexus-v doctor  # or: nexus-v dr
+```
+
 ### Dry run (preview without writing files)
 
 ```bash

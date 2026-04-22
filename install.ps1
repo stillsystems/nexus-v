@@ -6,8 +6,11 @@ if (-not (Test-Path $destDir)) {
     New-Item -Path $destDir -ItemType Directory
 }
 
-$url = "https://github.com/billy-kidd-dev/nexus-v/releases/latest/download/nexus-v-windows-amd64.exe"
-Invoke-WebRequest -Uri $url -OutFile "$destDir\nexus-v.exe"
+$url = "https://github.com/billy-kidd-dev/nexus-v/releases/latest/download/nexus-v_windows_amd64.zip"
+$zipFile = "$destDir\nexus-v.zip"
+Invoke-WebRequest -Uri $url -OutFile $zipFile
+Expand-Archive -Path $zipFile -DestinationPath $destDir -Force
+Remove-Item $zipFile
 
 # Add to PATH if not already there
 $path = [Environment]::GetEnvironmentVariable("PATH", "User")

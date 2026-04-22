@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"nexus-v/internal/tui"
 )
 
 type Answers struct {
@@ -26,7 +28,13 @@ func AskQuestions() (*Answers, error) {
 	identifier := ask(reader, "Extension identifier", sanitizeIdentifier(name))
 	description := ask(reader, "Description", "A helpful VS Code extension")
 	publisher := ask(reader, "Publisher", "your-publisher-id")
-	variant := ask(reader, "Template variant", "command")
+
+	// Use TUI for variant selection
+	variant, err := tui.SelectVariant([]string{"command", "webview", "language", "theme"})
+	if err != nil {
+		variant = "command" // fallback
+	}
+
 	commandName := ask(reader, "Command name", identifier+".helloWorld")
 
 	return &Answers{
