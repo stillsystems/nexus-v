@@ -1,4 +1,4 @@
-name: Release
+name: Build & Release
 
 on:
   push:
@@ -6,8 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  build:
-    name: Build and Release
+  release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -23,11 +22,11 @@ jobs:
       - name: Build
         run: |
           mkdir dist
-          GOOS=linux GOARCH=amd64 go build -o dist/nexus-v-linux-amd64 ./cmd/nexus-v.go
-          GOOS=linux GOARCH=arm64 go build -o dist/nexus-v-linux-arm64 ./cmd/nexus-v.go
-          GOOS=darwin GOARCH=amd64 go build -o dist/nexus-v-darwin-amd64 ./cmd/nexus-v.go
-          GOOS=darwin GOARCH=arm64 go build -o dist/nexus-v-darwin-arm64 ./cmd/nexus-v.go
-          GOOS=windows GOARCH=amd64 go build -o dist/nexus-v-windows-amd64.exe ./cmd/nexus-v.go
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o dist/nexus-v-linux-amd64 ./cmd/nexus-v.go
+          CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o dist/nexus-v-linux-arm64 ./cmd/nexus-v.go
+          CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o dist/nexus-v-darwin-amd64 ./cmd/nexus-v.go
+          CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -o dist/nexus-v-darwin-arm64 ./cmd/nexus-v.go
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o dist/nexus-v-windows-amd64.exe ./cmd/nexus-v.go
 
       - name: Release
         uses: softprops/action-gh-release@v2
