@@ -23,6 +23,20 @@ type release struct {
 }
 
 func CheckAndApply() error {
+	exePath, _ := os.Executable()
+	if isManagedByPkgManager(exePath) {
+		fmt.Println("⚠️  WARNING: nexus-v appears to be managed by a package manager (Homebrew, Scoop, or Winget).")
+		fmt.Println("   Updating via 'nexus-v update' may conflict with your package manager's state.")
+		fmt.Println("   It is recommended to use your package manager to update (e.g., 'brew upgrade nexus-v').")
+		fmt.Print("   Do you want to proceed anyway? (y/N): ")
+		var answer string
+		fmt.Scanln(&answer)
+		if strings.ToLower(answer) != "y" {
+			fmt.Println("Update cancelled.")
+			return nil
+		}
+	}
+
 	fmt.Printf("Checking for updates for %s...\n", repo)
 
 	resp, err := http.Get(fmt.Sprintf("https://api.github.com/repos/%s/releases/latest", repo))
@@ -76,6 +90,17 @@ func CheckAndApply() error {
 	}
 
 	return applyUpdate(downloadURL)
+}
+
+// isManagedByPkgManager uses a best-effort heuristic to detect if the binary
+// was installed via a package manager. Note that this can fail if the user
+// uses custom prefixes or symlinks that don't follow standard patterns.
+func isManagedByPkgManager(path string) bool {
+	path = strings.ToLower(path)
+	return strings.Contains(path, "homebrew") ||
+		strings.Contains(path, "scoop") ||
+		strings.Contains(path, "winget") ||
+		strings.Contains(path, "cellar")
 }
 
 func applyUpdate(url string) error {

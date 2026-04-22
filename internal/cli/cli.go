@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"nexus-v/internal/config"
 	"nexus-v/internal/doctor"
@@ -28,8 +29,8 @@ func Run() {
 	switch cmd {
 	case "init", "i":
 		runInit(os.Args[2:])
-	case "variants", "vars", "ls":
-		runVariants()
+	case "variants", "vars", "ls", "list":
+		runList(os.Args[2:])
 	case "version", "v", "-v", "--version":
 		fmt.Printf("nexus-v %s (%s/%s)\n", version.Version, runtime.GOOS, runtime.GOARCH)
 	case "update", "u":
@@ -52,14 +53,28 @@ func printUsage() {
 	fmt.Println("Usage: nexus-v <command> [options]")
 	fmt.Println("\nCommands:")
 	fmt.Println("  init      Scaffold a new VS Code extension project")
-	fmt.Println("  variants  List available template variants")
+	fmt.Println("  list      List available template variants (aliases: variants, vars, ls)")
 	fmt.Println("  version   Print version information")
 	fmt.Println("  update    Update nexus-v to the latest version")
 	fmt.Println("  doctor    Check environment for required tools")
+	fmt.Println("\nSupported Licenses: MIT, Apache-2.0, GPL-3.0, BSD-3-Clause, Unlicense")
 }
 
-func runVariants() {
-	templatesList, err := templates.ListTemplates()
+func runList(args []string) {
+	listCmd := flag.NewFlagSet("list", flag.ExitOnError)
+	templateDir := listCmd.String("template-dir", "", "Remote template directory to list")
+	templateRef := listCmd.String("template-ref", "", "Git ref for remote template")
+	listCmd.Parse(args)
+
+	var templatesList []string
+	var err error
+
+	if *templateDir != "" {
+		templatesList, err = templates.ListRemoteTemplates(*templateDir, *templateRef)
+	} else {
+		templatesList, err = templates.ListTemplates()
+	}
+
 	if err != nil {
 		Error("Failed to list templates: " + err.Error())
 		os.Exit(1)
@@ -79,7 +94,9 @@ func runInit(args []string) {
 		description = initCmd.String("description", "", "Short description")
 		publisher   = initCmd.String("publisher", "", "Publisher ID")
 		variant     = initCmd.String("variant", "", "Template variant")
-		templateDir = initCmd.String("template-dir", "", "Custom template directory")
+		templateDir = initCmd.String("template-dir", "", "Custom template directory (Git URL or local path)")
+		templateRef = initCmd.String("template-ref", "", "Git ref (branch, tag, or SHA) for remote templates")
+		license     = initCmd.String("license", "", "License type (e.g. MIT, Apache-2.0)")
 		force       = initCmd.Bool("force", false, "Overwrite existing files")
 		dryRun      = initCmd.Bool("dry-run", false, "Preview files without writing them")
 		out         = initCmd.String("out", "", "Output directory")
@@ -107,10 +124,17 @@ func runInit(args []string) {
 	cfg, _ := config.LoadConfig(cfgTarget)
 
 	// Resolve the final context
-	ctx, resolvedTarget, err := resolveContext(cfg, *name, *identifier, *description, *publisher, *variant, *templateDir, targetDir)
+	ctx, resolvedTarget, err := resolveContext(cfg, *name, *identifier, *description, *publisher, *variant, *templateDir, *templateRef, *license, targetDir)
 	if err != nil {
 		Error(err.Error())
 		os.Exit(1)
+	}
+
+	if ctx.CustomTemplateDir != "" && isGitURL(ctx.CustomTemplateDir) {
+		Warn("CAUTION: Scaffolding from a remote template. Only trust templates from sources you know.")
+		if ctx.TemplateRef == "" {
+			Info("TIP: Use --template-ref <branch/tag/sha> to pin this template for reproducible builds.")
+		}
 	}
 	targetDir = resolvedTarget
 	ctx.Force = *force
@@ -202,13 +226,35 @@ func firstNonEmpty(a, b string) string {
 	return b
 }
 
-func resolveContext(cfg config.Config, name, id, desc, publisher, variant, templateDir, targetDir string) (templates.Context, string, error) {
+func resolveContext(cfg config.Config, name, id, desc, publisher, variant, templateDir, templateRef, license, targetDir string) (templates.Context, string, error) {
 	finalName := name
 	finalID := id
 	finalDesc := desc
 	finalPublisher := firstNonEmpty(publisher, cfg.Defaults.Publisher)
 	finalVariant := firstNonEmpty(variant, cfg.Defaults.Variant)
 	finalTemplateDir := templateDir
+	finalTemplateRef := templateRef
+	finalLicense := firstNonEmpty(license, cfg.Defaults.License)
+
+	// Validate license
+	supportedLicenses := map[string]bool{
+		"MIT":            true,
+		"Apache-2.0":     true,
+		"GPL-3.0":        true,
+		"BSD-3-Clause":   true,
+		"Unlicense":      true,
+		"None":           true,
+	}
+	if finalLicense != "" && !supportedLicenses[finalLicense] {
+		var supported []string
+		for l := range supportedLicenses {
+			if l != "None" {
+				supported = append(supported, l)
+			}
+		}
+		Error(fmt.Sprintf("Unsupported license: %s. \nSupported licenses are: %s", finalLicense, strings.Join(supported, ", ")))
+		os.Exit(1)
+	}
 
 	// If interactive mode is needed
 	if finalName == "" || finalID == "" || finalDesc == "" || finalPublisher == "" {
@@ -248,8 +294,17 @@ func resolveContext(cfg config.Config, name, id, desc, publisher, variant, templ
 		Publisher:         finalPublisher,
 		CommandName:       finalID + ".helloWorld",
 		Template:          finalVariant,
+		TemplateRef:       finalTemplateRef,
 		CustomTemplateDir: finalTemplateDir,
+		License:           finalLicense,
 	}
 
 	return ctx, targetDir, nil
+}
+
+func isGitURL(path string) bool {
+	return strings.HasPrefix(path, "http://") ||
+		strings.HasPrefix(path, "https://") ||
+		strings.HasPrefix(path, "git@") ||
+		strings.HasPrefix(path, "file://")
 }

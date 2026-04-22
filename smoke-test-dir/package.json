@@ -1,10 +1,10 @@
 {
-  "name": "{{ .Identifier }}",
-  "displayName": "{{ .Name }}",
-  "publisher": "{{ .Publisher }}",
-  "description": "{{ .Description }}",
+  "name": "smoke-test",
+  "displayName": "Smoke Test",
+  "publisher": "test-pub",
+  "description": "Testing things",
   "version": "0.0.1",
-  "license": "{{ .License }}",
+  "license": "Apache-2.0",
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -12,14 +12,14 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:{{ .CommandName }}"
+    "onCommand:smoke-test.helloWorld"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "{{ .CommandName }}",
-        "title": "{{ .Name }}"
+        "command": "smoke-test.helloWorld",
+        "title": "Smoke Test"
       }
     ]
   },

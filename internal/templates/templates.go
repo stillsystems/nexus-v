@@ -22,15 +22,51 @@ type Context struct {
 	Publisher         string
 	CommandName       string
 	Template          string
+	TemplateRef       string
 	CustomTemplateDir string
+	License           string
 	Force             bool
 	DryRun            bool
 }
 
 // ListTemplates returns all template variants in files/
 func ListTemplates() ([]string, error) {
-	entries, err := templateFS.ReadDir("files")
+	return listFromDir("files", true)
+}
+
+func ListRemoteTemplates(url, ref string) ([]string, error) {
+	if !git.Available() {
+		return nil, fmt.Errorf("git is not installed but is required for remote templates")
+	}
+
+	tmpDir, err := os.MkdirTemp("", "nexusv-ls-*")
 	if err != nil {
+		return nil, err
+	}
+	defer os.RemoveAll(tmpDir)
+
+	if err := git.CloneWithRef(url, ref, tmpDir); err != nil {
+		return nil, fmt.Errorf("failed to clone remote template: %w", err)
+	}
+
+	// Remote templates are expected to have a "files/" directory for variants
+	return listFromDir(filepath.Join(tmpDir, "files"), false)
+}
+
+func listFromDir(dir string, embedded bool) ([]string, error) {
+	var entries []os.DirEntry
+	var err error
+
+	if embedded {
+		entries, err = templateFS.ReadDir(dir)
+	} else {
+		entries, err = os.ReadDir(dir)
+	}
+
+	if err != nil {
+		if !embedded && os.IsNotExist(err) {
+			return nil, fmt.Errorf("this repository does not follow the NEXUS-V plugin convention (missing 'files/' directory)")
+		}
 		return nil, err
 	}
 
@@ -72,8 +108,8 @@ func GenerateProject(ctx Context, targetDir string) error {
 		}
 		defer os.RemoveAll(tmpDir)
 
-		fmt.Printf("Cloning remote template: %s...\n", ctx.CustomTemplateDir)
-		if err := git.Clone(ctx.CustomTemplateDir, tmpDir); err != nil {
+		fmt.Printf("Cloning remote template: %s (ref: %s)...\n", ctx.CustomTemplateDir, ctx.TemplateRef)
+		if err := git.CloneWithRef(ctx.CustomTemplateDir, ctx.TemplateRef, tmpDir); err != nil {
 			return fmt.Errorf("failed to clone remote template: %w", err)
 		}
 		ctx.CustomTemplateDir = tmpDir

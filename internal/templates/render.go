@@ -6,10 +6,15 @@ import (
 	"os"
 	"path/filepath"
 	"text/template"
+	"time"
 )
 
 func renderTemplate(data []byte, name, outPath string, ctx Context) error {
-	tmpl, err := template.New(name).Parse(string(data))
+	tmpl, err := template.New(name).Funcs(template.FuncMap{
+		"currentYear": func() int {
+			return time.Now().Year()
+		},
+	}).Parse(string(data))
 	if err != nil {
 		return fmt.Errorf("failed to parse template: %w", err)
 	}
