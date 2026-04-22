@@ -50,7 +50,8 @@ func Run() {
 }
 
 func printUsage() {
-	fmt.Println("Usage: nexus-v <command> [options]")
+	exe := filepath.Base(os.Args[0])
+	fmt.Printf("Usage: %s <command> [options]\n", exe)
 	fmt.Println("\nCommands:")
 	fmt.Println("  init      Scaffold a new VS Code extension project")
 	fmt.Println("  list      List available template variants (aliases: variants, vars, ls)")

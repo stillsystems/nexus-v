@@ -7,30 +7,5 @@
   "license": "{{ .License }}",
   "engines": {
     "vscode": "^1.90.0"
-  },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [
-    "onCommand:{{ .CommandName }}"
-  ],
-  "main": "./dist/extension.js",
-  "contributes": {
-    "commands": [
-      {
-        "command": "{{ .CommandName }}",
-        "title": "{{ .Name }}"
-      }
-    ]
-  },
-  "scripts": {
-    "vscode:prepublish": "npm run build",
-    "build": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "test": "echo \"No tests yet\""
-  },
-  "devDependencies": {
-    "typescript": "^5.0.0",
-    "@types/vscode": "^1.90.0"
   }
 }

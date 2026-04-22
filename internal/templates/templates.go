@@ -29,12 +29,21 @@ type Context struct {
 	DryRun            bool
 }
 
-// ListTemplates returns all template variants in files/
+// ListTemplates returns all user-facing template variants in files/
 func ListTemplates() ([]string, error) {
-	return listFromDir("files", true)
+	templates, err := listFromDir("files", true)
+	if err != nil {
+		return nil, err
+	}
+	return filterInternal(templates), nil
 }
 
 func ListRemoteTemplates(url, ref string) ([]string, error) {
+	// If it's a local directory, just list from there
+	if !isGitURL(url) {
+		return listFromDir(filepath.Join(url, "files"), false)
+	}
+
 	if !git.Available() {
 		return nil, fmt.Errorf("git is not installed but is required for remote templates")
 	}
@@ -51,6 +60,17 @@ func ListRemoteTemplates(url, ref string) ([]string, error) {
 
 	// Remote templates are expected to have a "files/" directory for variants
 	return listFromDir(filepath.Join(tmpDir, "files"), false)
+}
+
+func filterInternal(templates []string) []string {
+	var filtered []string
+	for _, t := range templates {
+		if t == "default" || t == ".vscode" {
+			continue
+		}
+		filtered = append(filtered, t)
+	}
+	return filtered
 }
 
 func listFromDir(dir string, embedded bool) ([]string, error) {

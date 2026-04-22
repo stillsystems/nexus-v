@@ -2,6 +2,7 @@ package tui
 
 import (
 	"os"
+	"strings"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -60,14 +61,28 @@ func (m model) View() string {
 }
 
 func SelectVariant(variants []string) (string, error) {
-	items := []list.Item{
-		item{id: "command", title: "Command", desc: "Basic extension with a registered command"},
-		item{id: "webview", title: "Webview", desc: "Extension with a custom HTML webview panel"},
-		item{id: "language", title: "Language", desc: "Language support with syntax highlighting"},
-		item{id: "theme", title: "Theme", desc: "Custom color theme extension"},
+	var items []list.Item
+	for _, v := range variants {
+		desc := "Scaffold using the " + v + " template"
+		// Provide better descriptions for built-in variants
+		switch v {
+		case "command":
+			desc = "Basic extension with a registered command"
+		case "webview":
+			desc = "Extension with a custom HTML webview panel"
+		case "language":
+			desc = "Language support with syntax highlighting"
+		case "theme":
+			desc = "Custom color theme extension"
+		case "minimal":
+			desc = "Bare-bones extension structure"
+		case "multi":
+			desc = "Advanced template with multiple commands"
+		case "web":
+			desc = "Web-compatible extension (browser-ready)"
+		}
+		items = append(items, item{id: v, title: strings.Title(v), desc: desc})
 	}
-
-	// Filter based on available variants if needed, but for now we use the hardcoded pro ones
 
 	l := list.New(items, list.NewDefaultDelegate(), 0, 0)
 	l.Title = "Select Template Variant"

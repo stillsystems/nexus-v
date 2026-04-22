@@ -83,7 +83,7 @@ curl -fsSL https://raw.githubusercontent.com/billy-kidd-dev/nexus-v/main/install
 ### Interactive Mode (TUI)
 
 ```bash
-nexus-v init  # or: nexus-v i
+./nexus-v init  # or: ./nexus-v i
 ```
 
 NEXUS-V will launch a beautiful interactive menu for selecting your extension type.
@@ -93,7 +93,7 @@ NEXUS-V will launch a beautiful interactive menu for selecting your extension ty
 NEXUS-V supports scaffolding directly from remote Git repositories. This allows you to use community-created templates as plugins:
 
 ```bash
-nexus-v init --template-dir https://github.com/user/my-custom-template
+./nexus-v init --template-dir https://github.com/user/my-custom-template
 ```
 
 ### Check Environment
@@ -101,13 +101,13 @@ nexus-v init --template-dir https://github.com/user/my-custom-template
 Ensure you have all the necessary tools installed for VS Code development:
 
 ```bash
-nexus-v doctor  # or: nexus-v dr
+./nexus-v doctor  # or: ./nexus-v dr
 ```
 
 ### Update NEXUS-V
 
 ```bash
-nexus-v update  # or: nexus-v u
+./nexus-v update  # or: ./nexus-v u
 ```
 
 > [!NOTE]
@@ -118,13 +118,13 @@ nexus-v update  # or: nexus-v u
 List available local templates:
 
 ```bash
-nexus-v list  # or: nexus-v ls
+./nexus-v list  # or: ./nexus-v ls
 ```
 
 List variants available in a remote template:
 
 ```bash
-nexus-v list --template-dir https://github.com/user/my-custom-template
+./nexus-v list --template-dir https://github.com/user/my-custom-template
 ```
 
 ---
@@ -196,6 +196,9 @@ While the NEXUS-V binary itself requires no dependencies to run, the **scaffolde
 | `webview` | Extension with a webview panel boilerplate |
 | `language` | Language support with syntax highlighting and config |
 | `theme` | Color theme extension with a base theme JSON |
+| `minimal` | Bare-bones extension structure with minimal boilerplate |
+| `multi` | Advanced template with multiple commands and subdirectories |
+| `web` | Web-compatible extension (browser-ready) |
 
 ---
 

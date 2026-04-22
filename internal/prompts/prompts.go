@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"nexus-v/internal/templates"
 	"nexus-v/internal/tui"
 )
 
@@ -30,7 +31,8 @@ func AskQuestions() (*Answers, error) {
 	publisher := ask(reader, "Publisher", "your-publisher-id")
 
 	// Use TUI for variant selection
-	variant, err := tui.SelectVariant([]string{"command", "webview", "language", "theme"})
+	vars, _ := templates.ListTemplates()
+	variant, err := tui.SelectVariant(vars)
 	if err != nil {
 		variant = "command" // fallback
 	}
