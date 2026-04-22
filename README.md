@@ -134,6 +134,16 @@ nexus-v init --template-dir ./my-custom-templates
 nexus-v variants  # or: nexus-v ls / nexus-v vars
 ```
 
+### Remote Templates (Plugins)
+
+NEXUS-V supports scaffolding directly from remote Git repositories. This allows you to use community-created templates as plugins:
+
+```bash
+nexus-v init --template-dir https://github.com/user/my-custom-template
+```
+
+NEXUS-V will automatically clone the repository, render it, and clean up the temporary files.
+
 ### Update NEXUS-V
 
 ```bash

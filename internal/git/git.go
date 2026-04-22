@@ -26,3 +26,9 @@ func FirstCommit(dir string) error {
 	cmd.Dir = dir
 	return cmd.Run()
 }
+
+func Clone(url, dest string) error {
+	cmd := exec.Command("git", "clone", "--depth", "1", url, dest)
+	return cmd.Run()
+}
+

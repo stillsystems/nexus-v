@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 	"text/template"
+
+	"nexus-v/internal/git"
 )
 
 //go:embed files/**
@@ -57,6 +59,24 @@ func GenerateProject(ctx Context, targetDir string) error {
 	type source struct {
 		path    string
 		isLocal bool
+	}
+
+	// Handle remote templates (Plugins)
+	if isGitURL(ctx.CustomTemplateDir) {
+		if !git.Available() {
+			return fmt.Errorf("git is not installed but is required for remote templates")
+		}
+		tmpDir, err := os.MkdirTemp("", "nexusv-tpl-*")
+		if err != nil {
+			return err
+		}
+		defer os.RemoveAll(tmpDir)
+
+		fmt.Printf("Cloning remote template: %s...\n", ctx.CustomTemplateDir)
+		if err := git.Clone(ctx.CustomTemplateDir, tmpDir); err != nil {
+			return fmt.Errorf("failed to clone remote template: %w", err)
+		}
+		ctx.CustomTemplateDir = tmpDir
 	}
 
 	var sources []source
@@ -161,3 +181,10 @@ func processItem(rel, srcPath string, isDir bool, isLocal bool, targetDir string
 	}
 	return renderEmbeddedFile(srcPath, outPath, ctx)
 }
+
+func isGitURL(path string) bool {
+	return strings.HasPrefix(path, "http://") ||
+		strings.HasPrefix(path, "https://") ||
+		strings.HasPrefix(path, "git@")
+}
+
