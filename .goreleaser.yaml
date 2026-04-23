@@ -102,10 +102,6 @@ winget:
     # Only use the Windows amd64 archive
     ids:
       - archive
-    goos:
-      - windows
-    goarch:
-      - amd64
 
 
 
