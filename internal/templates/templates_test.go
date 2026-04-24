@@ -20,7 +20,7 @@ func TestGenerateProject(t *testing.T) {
 		Description: "A test description",
 		Publisher:   "test-publisher",
 		CommandName: "test-extension.hello",
-		Template:    "default",
+		Template:    "command",
 		Force:       false,
 		DryRun:      false,
 	}

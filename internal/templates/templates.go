@@ -15,6 +15,7 @@ import (
 //go:embed files/**
 var templateFS embed.FS
 
+// Context holds the variables and flags used during the template rendering process.
 type Context struct {
 	Name              string
 	Identifier        string
@@ -25,6 +26,8 @@ type Context struct {
 	TemplateRef       string
 	CustomTemplateDir string
 	License           string
+	UserName          string
+	NodeVersion       string
 	Force             bool
 	DryRun            bool
 }
@@ -38,6 +41,7 @@ func ListTemplates() ([]string, error) {
 	return filterInternal(templates), nil
 }
 
+// ListRemoteTemplates lists all template variants available in a remote Git repository.
 func ListRemoteTemplates(url, ref string) ([]string, error) {
 	// If it's a local directory, just list from there
 	if !isGitURL(url) {
@@ -99,6 +103,8 @@ func listFromDir(dir string, embedded bool) ([]string, error) {
 	return out, nil
 }
 
+// GenerateProject scaffolds a new project by rendering templates from one or more sources
+// into the target directory based on the provided Context.
 func GenerateProject(ctx Context, targetDir string) error {
 	if ctx.Template == "" && ctx.CustomTemplateDir == "" {
 		ctx.Template = "default"
@@ -200,12 +206,18 @@ func processItem(rel, srcPath string, isDir bool, isLocal bool, targetDir string
 	// Support template rendering in filenames
 	if strings.Contains(outPath, "{{") {
 		t, err := template.New("path").Parse(outPath)
-		if err == nil {
-			var buf strings.Builder
-			if err := t.Execute(&buf, ctx); err == nil {
-				outPath = buf.String()
-			}
+		if err != nil {
+			return fmt.Errorf("failed to parse filename template %q: %w", outPath, err)
 		}
+		var buf strings.Builder
+		if err := t.Execute(&buf, ctx); err != nil {
+			return fmt.Errorf("failed to execute filename template %q: %w", outPath, err)
+		}
+		rendered := buf.String()
+		if rendered == "" {
+			return fmt.Errorf("filename template %q rendered to an empty string", outPath)
+		}
+		outPath = rendered
 	}
 
 	if isDir {
@@ -218,12 +230,7 @@ func processItem(rel, srcPath string, isDir bool, isLocal bool, targetDir string
 
 	outPath = strings.TrimSuffix(outPath, ".tmpl")
 
-	if ctx.DryRun {
-		fmt.Println("[file] ", outPath)
-		return nil
-	}
-
-	if !ctx.Force {
+	if !ctx.Force && !ctx.DryRun {
 		if _, err := os.Stat(outPath); err == nil {
 			return fmt.Errorf(
 				"refusing to overwrite existing file: %s (use --force to override)",

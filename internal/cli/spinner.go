@@ -6,7 +6,8 @@ import (
 )
 
 type Spinner struct {
-	stop chan struct{}
+	stop   chan struct{}
+	active bool
 }
 
 func NewSpinner() *Spinner {
@@ -14,6 +15,8 @@ func NewSpinner() *Spinner {
 }
 
 func (s *Spinner) Start(msg string) {
+	s.active = true
+	fmt.Print("\033[?25l") // Hide cursor
 	go func() {
 		frames := []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
 		i := 0
@@ -31,6 +34,11 @@ func (s *Spinner) Start(msg string) {
 }
 
 func (s *Spinner) Stop() {
+	if !s.active {
+		return
+	}
+	s.active = false
 	close(s.stop)
-	fmt.Print("\r\033[K")
+	fmt.Print("\r\033[K")   // Clear line
+	fmt.Print("\033[?25h") // Show cursor
 }

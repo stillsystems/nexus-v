@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -31,6 +32,29 @@ type Config struct {
 	Defaults  DefaultsConfig  `yaml:"defaults"`
 	Telemetry TelemetryConfig `yaml:"telemetry"`
 	Hooks     HookConfig      `yaml:"hooks"`
+}
+
+func (c *Config) Validate() error {
+	supportedLicenses := map[string]bool{
+		"MIT":          true,
+		"Apache-2.0":   true,
+		"GPL-3.0":      true,
+		"BSD-3-Clause": true,
+		"Unlicense":    true,
+		"None":         true,
+	}
+
+	if c.Defaults.License != "" && !supportedLicenses[c.Defaults.License] {
+		return fmt.Errorf("unsupported license in config: %s", c.Defaults.License)
+	}
+
+	// Basic validation for variant - though custom templates might use anything,
+	// we can at least check if it's empty if not using customTemplateDir.
+	if c.Defaults.Variant == "" {
+		c.Defaults.Variant = "command"
+	}
+
+	return nil
 }
 
 func LoadConfig(targetDir string) (Config, error) {
@@ -74,5 +98,5 @@ func LoadConfig(targetDir string) (Config, error) {
 		cfg.Telemetry.Enabled = true
 	}
 
-	return cfg, nil
+	return cfg, cfg.Validate()
 }

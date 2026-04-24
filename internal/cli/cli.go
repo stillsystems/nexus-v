@@ -4,9 +4,13 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/exec"
+	"os/signal"
+	"os/user"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"syscall"
 
 	"nexus-v/internal/config"
 	"nexus-v/internal/doctor"
@@ -143,14 +147,7 @@ func runInit(args []string) {
 
 	useGit := cfg.Defaults.Git && !*noGit
 
-	tel := telemetry.Telemetry{
-		SessionEnabled: cfg.Telemetry.Enabled && cfg.Telemetry.Session,
-		LocalEnabled:   cfg.Telemetry.Enabled && cfg.Telemetry.Local,
-		ProjectEnabled: cfg.Telemetry.Enabled && cfg.Telemetry.Project,
-		SessionSink:    &telemetry.SessionSink{},
-		LocalSink:      &telemetry.LocalSink{},
-		ProjectSink:    &telemetry.ProjectSink{},
-	}
+	tel := telemetry.New(cfg.Telemetry.Enabled, cfg.Telemetry.Session, cfg.Telemetry.Local, cfg.Telemetry.Project)
 
 	if !*noHooks && len(cfg.Hooks.Pre) > 0 {
 		Info("Running pre-scaffold hooks...")
@@ -160,9 +157,20 @@ func runInit(args []string) {
 	}
 
 	spin := NewSpinner()
+	
+	// Handle termination signals to ensure spinner stops and cursor is restored
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-sigChan
+		spin.Stop()
+		os.Exit(1)
+	}()
+
 	spin.Start("Generating project...")
 	err = templates.GenerateProject(ctx, targetDir)
 	spin.Stop()
+	signal.Stop(sigChan) // Stop listening for signals after generation
 
 	ev := telemetry.Event{
 		Template:   ctx.Template,
@@ -228,79 +236,91 @@ func firstNonEmpty(a, b string) string {
 }
 
 func resolveContext(cfg config.Config, name, id, desc, publisher, variant, templateDir, templateRef, license, targetDir string) (templates.Context, string, error) {
-	finalName := name
-	finalID := id
-	finalDesc := desc
-	finalPublisher := firstNonEmpty(publisher, cfg.Defaults.Publisher)
-	finalVariant := firstNonEmpty(variant, cfg.Defaults.Variant)
-	finalTemplateDir := templateDir
-	finalTemplateRef := templateRef
-	finalLicense := firstNonEmpty(license, cfg.Defaults.License)
+	// 1. Resolve from flags and config
+	ctx, resolvedTarget := resolveFlags(cfg, name, id, desc, publisher, variant, templateDir, templateRef, license, targetDir)
 
-	// Validate license
-	supportedLicenses := map[string]bool{
-		"MIT":            true,
-		"Apache-2.0":     true,
-		"GPL-3.0":        true,
-		"BSD-3-Clause":   true,
-		"Unlicense":      true,
-		"None":           true,
-	}
-	if finalLicense != "" && !supportedLicenses[finalLicense] {
-		var supported []string
-		for l := range supportedLicenses {
-			if l != "None" {
-				supported = append(supported, l)
-			}
-		}
-		Error(fmt.Sprintf("Unsupported license: %s. \nSupported licenses are: %s", finalLicense, strings.Join(supported, ", ")))
-		os.Exit(1)
-	}
-
-	// If interactive mode is needed
-	if finalName == "" || finalID == "" || finalDesc == "" || finalPublisher == "" {
-		answers, err := prompts.AskQuestions()
-		if err != nil {
-			return templates.Context{}, "", fmt.Errorf("failed to read input: %w", err)
-		}
-		if finalName == "" {
-			finalName = answers.Name
-		}
-		if finalID == "" {
-			finalID = answers.Identifier
-		}
-		if finalDesc == "" {
-			finalDesc = answers.Description
-		}
-		if finalPublisher == "" {
-			finalPublisher = answers.Publisher
-		}
-		if finalVariant == "" && finalTemplateDir == "" && answers.Variant != "" {
-			finalVariant = answers.Variant
+	// 2. If essential info is missing, resolve interactively
+	if ctx.Name == "" || ctx.Identifier == "" || ctx.Description == "" || ctx.Publisher == "" {
+		if err := resolveInteractive(&ctx); err != nil {
+			return templates.Context{}, "", err
 		}
 	}
 
-	if finalVariant == "" && finalTemplateDir == "" {
-		finalVariant = "command"
+	// 3. Post-resolution defaults
+	if ctx.Template == "" && ctx.CustomTemplateDir == "" {
+		ctx.Template = "command"
+	}
+	if resolvedTarget == "" {
+		resolvedTarget = ctx.Identifier
 	}
 
-	if targetDir == "" {
-		targetDir = finalID
+	// 4. System info
+	u, _ := user.Current()
+	if u != nil {
+		ctx.UserName = u.Username
+	} else {
+		ctx.UserName = "unknown"
 	}
 
-	ctx := templates.Context{
-		Name:              finalName,
-		Identifier:        finalID,
-		Description:       finalDesc,
-		Publisher:         finalPublisher,
-		CommandName:       finalID + ".helloWorld",
-		Template:          finalVariant,
-		TemplateRef:       finalTemplateRef,
-		CustomTemplateDir: finalTemplateDir,
-		License:           finalLicense,
+	if out, err := exec.Command("node", "-v").Output(); err == nil {
+		ctx.NodeVersion = strings.TrimSpace(string(out))
+	} else {
+		ctx.NodeVersion = "unknown"
 	}
 
-	return ctx, targetDir, nil
+	// 5. Final validation (already partly done in config.LoadConfig, but good to be sure)
+	if ctx.License != "" {
+		supported := map[string]bool{"MIT": true, "Apache-2.0": true, "GPL-3.0": true, "BSD-3-Clause": true, "Unlicense": true, "None": true}
+		if !supported[ctx.License] {
+			return templates.Context{}, "", fmt.Errorf("unsupported license: %s", ctx.License)
+		}
+	}
+
+	return ctx, resolvedTarget, nil
+}
+
+func resolveFlags(cfg config.Config, name, id, desc, publisher, variant, templateDir, templateRef, license, targetDir string) (templates.Context, string) {
+	return templates.Context{
+		Name:              name,
+		Identifier:        id,
+		Description:       desc,
+		Publisher:         firstNonEmpty(publisher, cfg.Defaults.Publisher),
+		CommandName:       id + ".helloWorld",
+		Template:          firstNonEmpty(variant, cfg.Defaults.Variant),
+		TemplateRef:       templateRef,
+		CustomTemplateDir: templateDir,
+		License:           firstNonEmpty(license, cfg.Defaults.License),
+	}, targetDir
+}
+
+func resolveInteractive(ctx *templates.Context) error {
+	answers, err := prompts.AskQuestions()
+	if err != nil {
+		return fmt.Errorf("failed to read input: %w", err)
+	}
+
+	if ctx.Name == "" {
+		ctx.Name = answers.Name
+	}
+	if ctx.Identifier == "" {
+		ctx.Identifier = answers.Identifier
+	}
+	if ctx.Description == "" {
+		ctx.Description = answers.Description
+	}
+	if ctx.Publisher == "" {
+		ctx.Publisher = answers.Publisher
+	}
+	if ctx.Template == "" && ctx.CustomTemplateDir == "" && answers.Variant != "" {
+		ctx.Template = answers.Variant
+	}
+
+	// Update CommandName if Identifier changed
+	if ctx.CommandName == ".helloWorld" || ctx.CommandName == "" {
+		ctx.CommandName = ctx.Identifier + ".helloWorld"
+	}
+
+	return nil
 }
 
 func isGitURL(path string) bool {

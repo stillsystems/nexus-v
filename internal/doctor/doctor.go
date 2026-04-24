@@ -18,8 +18,11 @@ func RunChecks() {
 	checks := []Check{
 		{Name: "Node.js", Command: "node", Args: []string{"--version"}, Required: true, Description: "Required to run and develop VS Code extensions."},
 		{Name: "npm", Command: "npm", Args: []string{"--version"}, Required: true, Description: "Standard package manager for extension dependencies."},
-		{Name: "vsce", Command: "vsce", Args: []string{"--version"}, Required: false, Description: "Official tool for packaging and publishing (install with 'npm install -g @vscode/vsce')."},
+		{Name: "pnpm", Command: "pnpm", Args: []string{"--version"}, Required: false, Description: "Alternative fast, disk space efficient package manager."},
+		{Name: "yarn", Command: "yarn", Args: []string{"--version"}, Required: false, Description: "Alternative package manager for extension dependencies."},
 		{Name: "git", Command: "git", Args: []string{"--version"}, Required: true, Description: "Used for version control and scaffolding initialization."},
+		{Name: "Go", Command: "go", Args: []string{"version"}, Required: false, Description: "Required if you plan to contribute to NEXUS-V itself."},
+		{Name: "vsce", Command: "vsce", Args: []string{"--version"}, Required: false, Description: "Official tool for packaging and publishing (install with 'npm install -g @vscode/vsce')."},
 	}
 
 	fmt.Printf("NEXUS-V Doctor (%s/%s)\n", runtime.GOOS, runtime.GOARCH)

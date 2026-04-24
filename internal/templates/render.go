@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 	"time"
 )
@@ -13,6 +14,22 @@ func renderTemplate(data []byte, name, outPath string, ctx Context) error {
 	tmpl, err := template.New(name).Funcs(template.FuncMap{
 		"currentYear": func() int {
 			return time.Now().Year()
+		},
+		"licenseText": func(l string) string {
+			switch l {
+			case "MIT":
+				return MITLicense
+			case "Apache-2.0":
+				return Apache2License
+			case "Unlicense":
+				return Unlicense
+			case "BSD-3-Clause":
+				return BSD3License
+			case "GPL-3.0":
+				return GPL3License
+			default:
+				return "(No license text available for " + l + ")"
+			}
 		},
 	}).Parse(string(data))
 	if err != nil {
@@ -25,6 +42,20 @@ func renderTemplate(data []byte, name, outPath string, ctx Context) error {
 	}
 
 	if ctx.DryRun {
+		fmt.Println("[file] ", outPath)
+		// Preview key files
+		base := filepath.Base(outPath)
+		if base == "package.json" || base == "extension.ts" || base == "README.md" {
+			lines := strings.Split(buf.String(), "\n")
+			fmt.Printf("--- Preview: %s ---\n", outPath)
+			for i := 0; i < len(lines) && i < 10; i++ {
+				fmt.Println(lines[i])
+			}
+			if len(lines) > 10 {
+				fmt.Println("...")
+			}
+			fmt.Println("---------------------------")
+		}
 		return nil
 	}
 

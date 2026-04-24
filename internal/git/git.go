@@ -4,33 +4,40 @@ import (
 	"os/exec"
 )
 
+// Available checks if the git executable is present in the system's PATH.
 func Available() bool {
 	_, err := exec.LookPath("git")
 	return err == nil
 }
 
+// InitRepo initializes a new Git repository in the specified directory.
 func InitRepo(dir string) error {
 	cmd := exec.Command("git", "init")
 	cmd.Dir = dir
 	return cmd.Run()
 }
 
+// AddAll stages all changes in the specified directory for the next commit.
 func AddAll(dir string) error {
 	cmd := exec.Command("git", "add", ".")
 	cmd.Dir = dir
 	return cmd.Run()
 }
 
+// FirstCommit creates the initial commit with the message "Initial commit".
 func FirstCommit(dir string) error {
 	cmd := exec.Command("git", "commit", "-m", "Initial commit")
 	cmd.Dir = dir
 	return cmd.Run()
 }
 
+// Clone clones a git repository from a URL to a destination path using default settings.
 func Clone(url, dest string) error {
 	return CloneWithRef(url, "", dest)
 }
 
+// CloneWithRef clones a git repository and checks out a specific reference (branch, tag, or SHA).
+// It optimizes for speed by using shallow clones where possible.
 func CloneWithRef(url, ref, dest string) error {
 	args := []string{"clone"}
 

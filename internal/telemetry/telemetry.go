@@ -65,3 +65,15 @@ func (t Telemetry) Record(ev Event) {
 		t.ProjectSink.Record(ev)
 	}
 }
+
+// New creates a new Telemetry instance with the specified configuration.
+func New(enabled, session, local, project bool) Telemetry {
+	return Telemetry{
+		SessionEnabled: enabled && session,
+		LocalEnabled:   enabled && local,
+		ProjectEnabled: enabled && project,
+		SessionSink:    &SessionSink{},
+		LocalSink:      &LocalSink{},
+		ProjectSink:    &ProjectSink{},
+	}
+}
