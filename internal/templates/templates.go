@@ -220,6 +220,19 @@ func processItem(rel, srcPath string, isDir bool, isLocal bool, targetDir string
 		outPath = rendered
 	}
 
+	// Ensure outPath is within targetDir (Zip Slip protection)
+	absTarget, err := filepath.Abs(targetDir)
+	if err != nil {
+		return fmt.Errorf("failed to get absolute target path: %w", err)
+	}
+	absOut, err := filepath.Abs(outPath)
+	if err != nil {
+		return fmt.Errorf("failed to get absolute output path: %w", err)
+	}
+	if !strings.HasPrefix(absOut, absTarget) {
+		return fmt.Errorf("security violation: path %q attempts to write outside of target directory %q", outPath, targetDir)
+	}
+
 	if isDir {
 		if ctx.DryRun {
 			fmt.Println("[dir]  ", outPath)

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -95,5 +96,29 @@ func TestGenerateVariants(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+func TestZipSlipPrevention(t *testing.T) {
+	tempDir, _ := os.MkdirTemp("", "nexus-v-zipslip-*")
+	defer os.RemoveAll(tempDir)
+
+	target := filepath.Join(tempDir, "output")
+	_ = os.MkdirAll(target, 0o755)
+
+	// Create a context where the identifier would attempt to escape the directory
+	// Note: outPath in processItem uses filepath.Join(targetDir, filepath.FromSlash(rel))
+	// So to test this we might need a custom template source or force it in processItem.
+	// Since processItem is internal, we test through GenerateProject with a crafted identifier.
+
+	ctx := Context{
+		Identifier: "../../../../../evil",
+		Template:   "language",
+	}
+
+	err := GenerateProject(ctx, target)
+	if err == nil {
+		t.Errorf("expected security error for path escaping, got nil")
+	} else if !strings.Contains(err.Error(), "security violation") {
+		t.Errorf("expected security violation error, got: %v", err)
 	}
 }

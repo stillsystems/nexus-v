@@ -1,6 +1,8 @@
 package update
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -11,6 +13,41 @@ import (
 
 	"nexus-v/internal/version"
 )
+
+func verifyChecksum(data []byte, url, targetName string) error {
+	resp, err := http.Get(url)
+	if err != nil {
+		return fmt.Errorf("failed to download checksums: %w", err)
+	}
+	defer resp.Body.Close()
+
+	content, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read checksums: %w", err)
+	}
+
+	lines := strings.Split(string(content), "\n")
+	var expectedHash string
+	for _, line := range lines {
+		if strings.Contains(line, targetName) {
+			expectedHash = strings.Fields(line)[0]
+			break
+		}
+	}
+
+	if expectedHash == "" {
+		return fmt.Errorf("no checksum found for %s", targetName)
+	}
+
+	sum := sha256.Sum256(data)
+	actualHash := hex.EncodeToString(sum[:])
+
+	if actualHash != expectedHash {
+		return fmt.Errorf("hash mismatch: expected %s, got %s", expectedHash, actualHash)
+	}
+
+	return nil
+}
 
 const repo = "SailorOps/nexus-v"
 
@@ -76,20 +113,28 @@ func CheckAndApply() error {
 		ext = ".exe"
 	}
 
-	// Match pattern: nexus-v-<os>-<arch><ext>
-	targetName := fmt.Sprintf("nexus-v-%s-%s%s", runtime.GOOS, runtime.GOARCH, ext)
+	// Match pattern: nexus-v_<os>_<arch><ext>
+	targetName := fmt.Sprintf("nexus-v_%s_%s%s", runtime.GOOS, runtime.GOARCH, ext)
+	checksumName := "checksums.txt"
+	var checksumURL string
+
 	for _, asset := range rel.Assets {
 		if asset.Name == targetName {
 			downloadURL = asset.URL
-			break
+		}
+		if asset.Name == checksumName {
+			checksumURL = asset.URL
 		}
 	}
 
 	if downloadURL == "" {
 		return fmt.Errorf("could not find binary for %s/%s in release %s", runtime.GOOS, runtime.GOARCH, latest)
 	}
+	if checksumURL == "" {
+		return fmt.Errorf("could not find checksums.txt in release %s", latest)
+	}
 
-	return applyUpdate(downloadURL)
+	return applyUpdate(downloadURL, checksumURL, targetName)
 }
 
 // isManagedByPkgManager uses a best-effort heuristic to detect if the binary
@@ -103,7 +148,7 @@ func isManagedByPkgManager(path string) bool {
 		strings.Contains(path, "cellar")
 }
 
-func applyUpdate(url string) error {
+func applyUpdate(url, checksumURL, targetName string) error {
 	fmt.Println("Downloading update...")
 
 	resp, err := http.Get(url)
@@ -114,6 +159,17 @@ func applyUpdate(url string) error {
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("failed to download update: %s", resp.Status)
+	}
+
+	// Read binary into memory for checksum verification
+	binaryData, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read update data: %w", err)
+	}
+
+	fmt.Println("Verifying checksum...")
+	if err := verifyChecksum(binaryData, checksumURL, targetName); err != nil {
+		return fmt.Errorf("checksum verification failed: %w", err)
 	}
 
 	exePath, err := os.Executable()
@@ -136,7 +192,7 @@ func applyUpdate(url string) error {
 		}
 	}()
 
-	if _, err := io.Copy(tmpFile, resp.Body); err != nil {
+	if _, err := tmpFile.Write(binaryData); err != nil {
 		return fmt.Errorf("failed to save update: %w", err)
 	}
 	tmpFile.Close()

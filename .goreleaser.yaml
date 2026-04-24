@@ -32,7 +32,7 @@ builds:
       - amd64
       - arm64
     main: ./cmd
-    binary: nexus-v-{{ .Os }}-{{ .Arch }}
+    binary: nexus-v_{{ .Os }}_{{ .Arch }}
 
 archives:
   - id: archive
