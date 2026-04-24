@@ -22,7 +22,7 @@ type Answers struct {
 func AskQuestions() (*Answers, error) {
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Println("Welcome to the VS Code Extension Scaffolder")
+	fmt.Println("⚓ SailorOps NEXUS-V")
 	fmt.Println("-------------------------------------------")
 
 	name := ask(reader, "Extension name", "my-extension")

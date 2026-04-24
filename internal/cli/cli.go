@@ -55,14 +55,25 @@ func Run() {
 
 func printUsage() {
 	exe := filepath.Base(os.Args[0])
-	fmt.Printf("Usage: %s <command> [options]\n", exe)
+	fmt.Printf("%s⚓ SailorOps NEXUS-V%s\n", Bold, Reset)
+	fmt.Printf("Modern developer tooling engineered for real-world conditions.\n\n")
+	
+	fmt.Printf("%sUsage:%s %s <command> [options]\n", Bold, Reset, exe)
 	fmt.Println("\nCommands:")
-	fmt.Println("  init      Scaffold a new VS Code extension project")
-	fmt.Println("  list      List available template variants (aliases: variants, vars, ls)")
-	fmt.Println("  version   Print version information")
-	fmt.Println("  update    Update nexus-v to the latest version")
-	fmt.Println("  doctor    Check environment for required tools")
-	fmt.Println("\nSupported Licenses: MIT, Apache-2.0, GPL-3.0, BSD-3-Clause, Unlicense")
+	fmt.Println("  init, i    Scaffold a new project")
+	fmt.Println("  list, ls   List template variants")
+	fmt.Println("  doctor, dr Check environment health")
+	fmt.Println("  update, u  Update to latest version")
+	fmt.Println("  version, v Print version info")
+	
+	fmt.Println("\nFlags (init):")
+	fmt.Println("  --out      Output directory")
+	fmt.Println("  --variant  Template variant")
+	fmt.Println("  --license  License type (MIT, Apache-2.0, etc.)")
+	fmt.Println("  --dry-run  Preview without writing")
+	fmt.Println("  --force    Overwrite existing files")
+	
+	fmt.Println("\nLearn more at: https://github.com/SailorOps/Nexus-V")
 }
 
 func runList(args []string) {
