@@ -1,4 +1,4 @@
-![SailorOps Banner](https://raw.githubusercontent.com/SailorOps/.github/main/profile/sailorops_banner.png)
+![Still Systems Banner](https://raw.githubusercontent.com/stillsystems/.github/main/profile/banner.png)
 
 # ⚓ NEXUS-V
 
@@ -9,7 +9,7 @@ Zero-install. Dependency-light. Predictable.
 
 ## 🧭 Philosophy
 
-NEXUS-V is the flagship project of the **SailorOps** ecosystem and embodies our core principles:
+NEXUS-V is the flagship project of the **Still Systems** ecosystem and embodies our core principles:
 - 🛡️ **Clarity over cleverness** — predictable behavior, no magic.
 - 📦 **Portability over complexity** — single static binaries, zero runtime dependencies.
 - ⚓ **Durability over trends** — built for long-term maintainability with minimal dependencies.
@@ -34,19 +34,19 @@ NEXUS-V is the flagship project of the **SailorOps** ecosystem and embodies our 
 
 ### **Homebrew (macOS / Linux)**
 ```bash
-brew tap SailorOps/nexusv
+brew tap stillsystems/nexusv
 brew install nexus-v
 ```
 
 ### **Scoop (Windows)**
 ```powershell
-scoop bucket add sailorops https://github.com/SailorOps/scoop-bucket
+scoop bucket add stillsystems https://github.com/stillsystems/scoop-bucket
 scoop install nexus-v
 ```
 
 ### **Winget (Windows)**
 ```powershell
-winget install SailorOps.NexusV
+winget install stillsystems.nexusv
 ```
 
 ---
@@ -86,9 +86,9 @@ nexus-v doctor
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see the [SailorOps Contribution Rules](https://github.com/SailorOps/.github/blob/main/brand/governance/contribution-rules.md) for our standards on clarity and dependency management.
+We welcome contributions! Please see the [Still Systems Contribution Rules](https://github.com/stillsystems/.github/blob/main/brand/governance/contribution-rules.md) for our standards on clarity and dependency management.
 
 ---
 
-⚓ **SailorOps** — Tools engineered for real-world conditions.  
-MIT © [SailorOps](https://github.com/SailorOps)
+⚓ **Still Systems** — Tools engineered for real-world conditions.  
+MIT © [Still Systems](https://github.com/stillsystems)

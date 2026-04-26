@@ -11,7 +11,7 @@ if [[ "$(uname -m)" == "arm64" || "$(uname -m)" == "aarch64" ]]; then
 fi
 
 # Download and extract binary
-URL="https://github.com/SailorOps/nexus-v/releases/latest/download/nexus-v_${OS}_${ARCH}.tar.gz"
+URL="https://github.com/stillsystems/nexus-v/releases/latest/download/nexus-v_${OS}_${ARCH}.tar.gz"
 curl -L "$URL" -o nexus-v.tar.gz
 tar -xzf nexus-v.tar.gz nexus-v
 rm nexus-v.tar.gz

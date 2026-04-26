@@ -6,7 +6,7 @@ if (-not (Test-Path $destDir)) {
     New-Item -Path $destDir -ItemType Directory
 }
 
-$url = "https://github.com/SailorOps/nexus-v/releases/latest/download/nexus-v-windows-amd64.exe"
+$url = "https://github.com/stillsystems/nexus-v/releases/latest/download/nexus-v-windows-amd64.exe"
 Invoke-WebRequest -Uri $url -OutFile "$destDir\nexus-v.exe"
 
 # Add to PATH if not already there

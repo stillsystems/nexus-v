@@ -65,10 +65,10 @@ changelog:
 brews:
   - name: nexus-v
     repository:
-      owner: SailorOps
+      owner: stillsystems
       name: homebrew-nexusv
     directory: Formula
-    homepage: "https://github.com/SailorOps/nexus-v"
+    homepage: "https://github.com/stillsystems/nexus-v"
     description: "A modern, zero-install VS Code extension scaffolder."
     license: "MIT"
     ids:
@@ -79,9 +79,9 @@ brews:
 scoops:
   - name: nexus-v
     repository:
-      owner: SailorOps
+      owner: stillsystems
       name: scoop-bucket
-    homepage: "https://github.com/SailorOps/nexus-v"
+    homepage: "https://github.com/stillsystems/nexus-v"
     description: "A modern, zero-install VS Code extension scaffolder."
     license: "MIT"
     ids:
@@ -89,20 +89,20 @@ scoops:
 
 winget:
   - name: nexus-v
-    publisher: SailorOps
-    package_identifier: SailorOps.NexusV
+    publisher: Still Systems
+    package_identifier: stillsystems.nexusv
     short_description: "A modern, zero-install VS Code extension scaffolder."
     description: "NEXUS-V replaces the legacy Yeoman generator with a single static binary that produces clean VS Code extension projects."
     license: MIT
-    homepage: "https://github.com/SailorOps/nexus-v"
-    publisher_url: "https://github.com/SailorOps"
+    homepage: "https://github.com/stillsystems/nexus-v"
+    publisher_url: "https://github.com/stillsystems"
     tags:
       - vscode
       - extension
       - yeoman
       - scaffolder
     repository:
-      owner: SailorOps
+      owner: stillsystems
       name: winget-nexusv
     ids:
       - archive

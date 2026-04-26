@@ -6,9 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.2] - 2026-04-22
 ### Changed
-- Transferred repository and all distribution channels to the **SailorOps** organization.
+- Transferred repository and all distribution channels to the **Still Systems** organization.
 - Updated internal update logic, installation scripts, and package manager manifests to point to the new organization.
-- Rebranded Winget publisher and package identifier to `SailorOps`.
+- Rebranded Winget publisher and package identifier to `stillsystems`.
 
 ## [0.2.1] - 2026-04-22
 ### Fixed

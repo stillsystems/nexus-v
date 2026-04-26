@@ -19,8 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     if: >
       github.event_name == 'workflow_dispatch' ||
-      github.event.pull_request.user.login == 'billy-sailorops' ||
-      github.event.pull_request.user.login == 'sailorops-bot' ||
+      github.event.pull_request.user.login == 'billykidd-stillsystems' ||
+      github.event.pull_request.user.login == 'stillsystems-bot' ||
       contains(github.event.pull_request.labels.*.name, 'brand-sync')
     steps:
       - name: Checkout

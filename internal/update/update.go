@@ -49,7 +49,7 @@ func verifyChecksum(data []byte, url, targetName string) error {
 	return nil
 }
 
-const repo = "SailorOps/nexus-v"
+const repo = "stillsystems/nexus-v"
 
 type release struct {
 	TagName string `json:"tag_name"`
