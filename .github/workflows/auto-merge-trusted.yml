@@ -24,7 +24,7 @@ jobs:
       contains(github.event.pull_request.labels.*.name, 'brand-sync')
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Auto-approve and Enable Auto-merge
         env:
