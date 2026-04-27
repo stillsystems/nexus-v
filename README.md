@@ -16,7 +16,7 @@ NEXUS-V is the flagship project of the **Still Systems** ecosystem. It is a ligh
 It embodies our core principles:
 - 🛡️ **Clarity over cleverness** — predictable behavior, no magic.
 - 📦 **Portability over complexity** — single static binaries, zero runtime dependencies.
-- ⚓ **Durability over trends** — built for long-term maintainability.
+- 🧱 **Durability over trends** — built for long-term maintainability.
 
 ## Installation / Quickstart
 
