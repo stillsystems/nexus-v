@@ -23,7 +23,7 @@ type Answers struct {
 func AskQuestions() (*Answers, error) {
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Println("⚓ Still Systems NEXUS-V")
+	fmt.Println("🧱 Still Systems NEXUS-V")
 	fmt.Println("-------------------------------------------")
 
 	name := ask(reader, "Extension name", "my-extension")

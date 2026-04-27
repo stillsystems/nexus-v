@@ -1,4 +1,4 @@
-# <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/stillsystems/.github/main/brand/logo.png"><img alt="Still Systems" src="https://raw.githubusercontent.com/stillsystems/.github/main/brand/logo.png" width="32" height="32"></picture> NEXUS-V
+# <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/stillsystems/.github/main/brand/logo.png"><img alt="Still Systems" src="https://raw.githubusercontent.com/stillsystems/.github/main/brand/logo.png" width="32" height="32"></picture> 🏗️ NEXUS-V
 
 **Modern developer tooling engineered for real-world conditions.**  
 Zero runtime dependencies. Dependency-light. Predictable.
@@ -81,4 +81,4 @@ We are committed to the long-term stability of the Still Systems ecosystem. See 
 Documentation • [Issues](https://github.com/stillsystems/nexus-v/issues) • [Support](https://github.com/stillsystems/.github/blob/main/SUPPORT.md)
 
 ---
-⚓ **Still Systems** — Tools engineered for real-world conditions.
+🧱 **Still Systems** — Tools engineered for real-world conditions.

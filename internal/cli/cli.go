@@ -41,7 +41,7 @@ func Run() {
 }
 
 func printUsage() {
-	fmt.Printf("%s⚓ Still Systems NEXUS-V%s\n", Bold, Reset)
+	fmt.Printf("%s🧱 Still Systems NEXUS-V%s\n", Bold, Reset)
 	fmt.Printf("Modern developer tooling engineered for real-world conditions.\n\n")
 	
 	fmt.Printf("%sUsage:%s nexus-v <command> [options]\n", Bold, Reset)

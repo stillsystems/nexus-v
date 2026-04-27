@@ -1,4 +1,4 @@
-# ⚓ Nexus-V Roadmap
+# 🏗️ Nexus-V Roadmap
 
 This document outlines the planned trajectory for **Nexus-V**. Our priority is always **Stability** and **Structural Clarity**, but we are excited to expand the engine's capabilities.
 
@@ -22,4 +22,4 @@ This document outlines the planned trajectory for **Nexus-V**. Our priority is a
 
 ---
 
-⚓ **Still Systems** — Modern developer tooling engineered for real-world conditions.
+🧱 **Still Systems** — Modern developer tooling engineered for real-world conditions.
