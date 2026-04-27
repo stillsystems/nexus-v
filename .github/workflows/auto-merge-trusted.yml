@@ -1,4 +1,4 @@
-name: ⚓ Auto-Merge Trusted PRs
+name: 🧱 Auto-Merge Trusted PRs
 
 on:
   pull_request:
