@@ -11,12 +11,9 @@ import (
 	"strings"
 	"syscall"
 
-	"nexus-v/internal/config"
-	"nexus-v/internal/git"
-	"nexus-v/internal/hooks"
 	"nexus-v/internal/prompts"
 	"nexus-v/internal/telemetry"
-	"nexus-v/internal/templates"
+	"nexus-v/pkg/nexusv"
 )
 
 func runInit(args []string) {
@@ -55,7 +52,7 @@ func runInit(args []string) {
 	if cfgTarget == "" {
 		cfgTarget = "."
 	}
-	cfg, _ := config.LoadConfig(cfgTarget)
+	cfg, _ := nexusv.LoadConfig(cfgTarget)
 
 	// Resolve the final context
 	ctx, resolvedTarget, err := resolveContext(cfg, *name, *identifier, *description, *publisher, *variant, *templateDir, *templateRef, *license, targetDir)
@@ -80,7 +77,7 @@ func runInit(args []string) {
 
 	if !*noHooks && len(cfg.Hooks.Pre) > 0 {
 		Info("Running pre-scaffold hooks...")
-		if err := hooks.RunHooks(targetDir, cfg.Hooks.Pre); err != nil {
+		if err := nexusv.RunHooks(targetDir, cfg.Hooks.Pre); err != nil {
 			Warn("Some pre-scaffold hooks failed: " + err.Error())
 		}
 	}
@@ -97,7 +94,7 @@ func runInit(args []string) {
 	}()
 
 	spin.Start("Generating project...")
-	err = templates.GenerateProject(ctx, targetDir)
+	err = nexusv.GenerateProject(ctx, targetDir)
 	spin.Stop()
 	signal.Stop(sigChan) // Stop listening for signals after generation
 
@@ -121,11 +118,11 @@ func runInit(args []string) {
 
 	Success("Project created at " + filepath.Clean(targetDir))
 
-	if useGit && git.Available() {
+	if useGit && nexusv.GitAvailable() {
 		Info("Initializing Git repository...")
-		if err := git.InitRepo(targetDir); err == nil {
-			git.AddAll(targetDir)
-			git.FirstCommit(targetDir)
+		if err := nexusv.GitInitRepo(targetDir); err == nil {
+			nexusv.GitAddAll(targetDir)
+			nexusv.GitFirstCommit(targetDir)
 			Success("Git repository initialized")
 		} else {
 			Warn("Git is installed but initialization failed")
@@ -147,7 +144,7 @@ func runInit(args []string) {
 
 	if !*noHooks && len(postHooks) > 0 {
 		Info("Running post-generation hooks...")
-		if err := hooks.RunHooks(targetDir, postHooks); err != nil {
+		if err := nexusv.RunHooks(targetDir, postHooks); err != nil {
 			Warn("Some post-generation hooks failed: " + err.Error())
 		} else {
 			Success("All hooks completed")
@@ -157,14 +154,14 @@ func runInit(args []string) {
 	Info("Run `npm install` then press F5 to launch the extension")
 }
 
-func resolveContext(cfg config.Config, name, id, desc, publisher, variant, templateDir, templateRef, license, targetDir string) (templates.Context, string, error) {
+func resolveContext(cfg nexusv.Config, name, id, desc, publisher, variant, templateDir, templateRef, license, targetDir string) (nexusv.Context, string, error) {
 	// 1. Resolve from flags and config
 	ctx, resolvedTarget := resolveFlags(cfg, name, id, desc, publisher, variant, templateDir, templateRef, license, targetDir)
 
 	// 2. If essential info is missing, resolve interactively
 	if ctx.Name == "" || ctx.Identifier == "" || ctx.Description == "" || ctx.Publisher == "" {
 		if err := resolveInteractive(&ctx); err != nil {
-			return templates.Context{}, "", err
+			return nexusv.Context{}, "", err
 		}
 	}
 
@@ -194,15 +191,15 @@ func resolveContext(cfg config.Config, name, id, desc, publisher, variant, templ
 	if ctx.License != "" {
 		supported := map[string]bool{"MIT": true, "Apache-2.0": true, "GPL-3.0": true, "BSD-3-Clause": true, "Unlicense": true, "None": true}
 		if !supported[ctx.License] {
-			return templates.Context{}, "", fmt.Errorf("unsupported license: %s", ctx.License)
+			return nexusv.Context{}, "", fmt.Errorf("unsupported license: %s", ctx.License)
 		}
 	}
 
 	return ctx, resolvedTarget, nil
 }
 
-func resolveFlags(cfg config.Config, name, id, desc, publisher, variant, templateDir, templateRef, license, targetDir string) (templates.Context, string) {
-	return templates.Context{
+func resolveFlags(cfg nexusv.Config, name, id, desc, publisher, variant, templateDir, templateRef, license, targetDir string) (nexusv.Context, string) {
+	return nexusv.Context{
 		Name:              name,
 		Identifier:        id,
 		Description:       desc,
@@ -215,7 +212,7 @@ func resolveFlags(cfg config.Config, name, id, desc, publisher, variant, templat
 	}, targetDir
 }
 
-func resolveInteractive(ctx *templates.Context) error {
+func resolveInteractive(ctx *nexusv.Context) error {
 	answers, err := prompts.AskQuestions()
 	if err != nil {
 		return fmt.Errorf("failed to read input: %w", err)

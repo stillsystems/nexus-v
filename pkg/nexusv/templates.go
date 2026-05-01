@@ -1,4 +1,4 @@
-package templates
+package nexusv
 
 import (
 	"embed"
@@ -8,8 +8,6 @@ import (
 	"path/filepath"
 	"strings"
 	"text/template"
-
-	"nexus-v/internal/git"
 )
 
 //go:embed files/**
@@ -48,7 +46,7 @@ func ListRemoteTemplates(url, ref string) ([]string, error) {
 		return listFromDir(filepath.Join(url, "files"), false)
 	}
 
-	if !git.Available() {
+	if !GitAvailable() {
 		return nil, fmt.Errorf("git is not installed but is required for remote templates")
 	}
 
@@ -58,7 +56,7 @@ func ListRemoteTemplates(url, ref string) ([]string, error) {
 	}
 	defer os.RemoveAll(tmpDir)
 
-	if err := git.CloneWithRef(url, ref, tmpDir); err != nil {
+	if err := GitCloneWithRef(url, ref, tmpDir); err != nil {
 		return nil, fmt.Errorf("failed to clone remote template: %w", err)
 	}
 
@@ -125,7 +123,7 @@ func GenerateProject(ctx Context, targetDir string) error {
 
 	// Handle remote templates (Plugins)
 	if isGitURL(ctx.CustomTemplateDir) {
-		if !git.Available() {
+		if !GitAvailable() {
 			return fmt.Errorf("git is not installed but is required for remote templates")
 		}
 		tmpDir, err := os.MkdirTemp("", "nexusv-tpl-*")
@@ -135,7 +133,7 @@ func GenerateProject(ctx Context, targetDir string) error {
 		defer os.RemoveAll(tmpDir)
 
 		fmt.Printf("Cloning remote template: %s (ref: %s)...\n", ctx.CustomTemplateDir, ctx.TemplateRef)
-		if err := git.CloneWithRef(ctx.CustomTemplateDir, ctx.TemplateRef, tmpDir); err != nil {
+		if err := GitCloneWithRef(ctx.CustomTemplateDir, ctx.TemplateRef, tmpDir); err != nil {
 			return fmt.Errorf("failed to clone remote template: %w", err)
 		}
 		ctx.CustomTemplateDir = tmpDir

@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"nexus-v/internal/templates"
 	"nexus-v/internal/tui"
+	"nexus-v/pkg/nexusv"
 )
 
 type Answers struct {
@@ -32,7 +32,7 @@ func AskQuestions() (*Answers, error) {
 	publisher := ask(reader, "Publisher", "your-publisher-id")
 
 	// Use TUI for variant selection
-	vars, _ := templates.ListTemplates()
+	vars, _ := nexusv.ListTemplates()
 	variant, err := tui.SelectVariant(vars)
 	if err != nil {
 		variant = "command" // fallback

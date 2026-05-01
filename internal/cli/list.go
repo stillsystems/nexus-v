@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"nexus-v/internal/templates"
+	"nexus-v/pkg/nexusv"
 )
 
 func runList(args []string) {
@@ -18,9 +18,9 @@ func runList(args []string) {
 	var err error
 
 	if *templateDir != "" {
-		templatesList, err = templates.ListRemoteTemplates(*templateDir, *templateRef)
+		templatesList, err = nexusv.ListRemoteTemplates(*templateDir, *templateRef)
 	} else {
-		templatesList, err = templates.ListTemplates()
+		templatesList, err = nexusv.ListTemplates()
 	}
 
 	if err != nil {
