@@ -119,4 +119,5 @@ winget:
 
 release:
   github:
-    draft: true
+    owner: stillsystems
+  draft: true
