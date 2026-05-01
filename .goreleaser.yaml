@@ -117,5 +117,6 @@ winget:
     ids:
       - archive
 
-
-
+release:
+  github:
+    draft: true
