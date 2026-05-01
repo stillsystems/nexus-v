@@ -74,6 +74,7 @@ brews:
     repository:
       owner: stillsystems
       name: homebrew-nexusv
+      token: "{{ .Env.GORELEASER_TOKEN }}"
     directory: Formula
     homepage: "https://github.com/stillsystems/nexus-v"
     description: "A modern VS Code extension scaffolder with zero runtime dependencies."
@@ -88,6 +89,7 @@ scoops:
     repository:
       owner: stillsystems
       name: scoop-bucket
+      token: "{{ .Env.GORELEASER_TOKEN }}"
     homepage: "https://github.com/stillsystems/nexus-v"
     description: "A modern VS Code extension scaffolder with zero runtime dependencies."
     license: "MIT"
@@ -111,6 +113,7 @@ winget:
     repository:
       owner: stillsystems
       name: winget-nexusv
+      token: "{{ .Env.GORELEASER_TOKEN }}"
     ids:
       - archive
 
