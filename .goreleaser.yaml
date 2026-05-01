@@ -69,7 +69,7 @@ changelog:
       - "^docs:"
       - "^test:"
 
-homebrews:
+brews:
   - name: nexus-v
     repository:
       owner: stillsystems
