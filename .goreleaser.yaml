@@ -36,13 +36,15 @@ builds:
 
 archives:
   - id: archive
-    builds:
+    ids:
       - archive
-    format: tar.gz
+    formats:
+      - tar.gz
     # use zip for windows archives
     format_overrides:
       - goos: windows
-        format: zip
+        formats:
+          - zip
     name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     files:
       - README.md
@@ -58,7 +60,7 @@ sboms:
       - "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}.sbom.json"
 
 snapshot:
-  name_template: "{{ .Tag }}-next"
+  version_template: "{{ .Tag }}-next"
 
 changelog:
   sort: asc
@@ -67,7 +69,7 @@ changelog:
       - "^docs:"
       - "^test:"
 
-brews:
+homebrews:
   - name: nexus-v
     repository:
       owner: stillsystems

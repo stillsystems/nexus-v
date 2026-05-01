@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.6] - 2026-05-01
+### Fixed
+- Restored cross-repo publishing for Homebrew, Scoop, and Winget.
+- Finalized CI/CD workflow with correct permissions.
+
+## [0.2.5] - 2026-04-27
+### Fixed
+- Release pipeline authentication and token scopes.
+
+## [0.2.4] - 2026-04-27
+### Added
+- SBOM (Software Bill of Materials) generation using Syft.
+
 ## [0.2.3] - 2026-04-26
 ### Added
 - Interactive **License** prompt during `init` (defaults to MIT).
