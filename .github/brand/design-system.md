@@ -1,4 +1,4 @@
-# Still Systems Design System
+﻿# Still Systems Design System
 
 The Still Systems Design System defines how the organization looks, sounds, and behaves across all tools, repos, and communication surfaces.
 
@@ -68,3 +68,4 @@ See `cli-style/cli-formatting.md`.
 See `governance/versioning.md`.
 
 This document evolves as Still Systems grows.
+

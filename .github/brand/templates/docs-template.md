@@ -1,7 +1,7 @@
-# ⚓ {TOPIC_NAME}
+﻿# 🧱 {TOPIC_NAME}
 
 ## 🧭 Overview
-{Summary of the topic and why it matters in the SailorOps ecosystem.}
+{Summary of the topic and why it matters in the Still Systems ecosystem.}
 
 ## 🛠️ Implementation
 {Step-by-step instructions or technical details.}
@@ -14,4 +14,5 @@
 
 ---
 
-⚓ **SailorOps** — Tools engineered for real-world conditions.
+🧱 **Still Systems** — Tools engineered for real-world conditions.
+

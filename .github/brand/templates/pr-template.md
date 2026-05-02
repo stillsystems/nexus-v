@@ -1,4 +1,4 @@
-## ⚓ Pull Request Template
+﻿## 🧱 Pull Request Template
 
 ### 🛡️ Alignment with Pillars
 - [ ] Does this PR prioritize **clarity over cleverness**?
@@ -18,4 +18,5 @@ Fixes #{Issue Number}
 
 ---
 
-⚓ **SailorOps** — Tools engineered for real-world conditions.
+🧱 **Still Systems** — Tools engineered for real-world conditions.
+

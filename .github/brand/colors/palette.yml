@@ -1,4 +1,4 @@
-# ⚓ SailorOps Brand Color Palette
+﻿# 🧱 Still Systems Brand Color Palette
 brand:
   primary:
     name: "Navy Anchor"
@@ -24,3 +24,4 @@ brand:
     name: "Slate Gray"
     hex: "#6B7280"
     usage: "Secondary text, captions, metadata"
+

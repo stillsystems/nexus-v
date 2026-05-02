@@ -1,4 +1,4 @@
-# SailorOps CLI Style Guide
+﻿# Still Systems CLI Style Guide
 
 ## Colors
 - Info: Ops Blue  
@@ -17,3 +17,4 @@
 - Ops Blue highlights  
 - Minimal borders  
 - Smooth, subtle transitions  
+

@@ -1,4 +1,4 @@
-# Still Systems TUI & CLI Design Language
+﻿# Still Systems TUI & CLI Design Language
 
 This document defines the visual and interactive standards for all Still Systems terminal interfaces.
 
@@ -27,3 +27,4 @@ This document defines the visual and interactive standards for all Still Systems
 ---
 
 🧱 **Still Systems** — Tools engineered for real-world conditions.
+

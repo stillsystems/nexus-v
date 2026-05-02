@@ -1,4 +1,4 @@
-# SailorOps Logo Usage Guidelines
+﻿# Still Systems Logo Usage Guidelines
 
 ## Primary Logo
 Anchor + compass + circuitry emblem.
@@ -14,3 +14,4 @@ Minimal compass for small sizes.
 - Do not stretch, skew, recolor, or add effects.
 - Use metallic version on dark backgrounds.
 - Use flat version on light backgrounds.
+

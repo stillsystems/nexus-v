@@ -1,4 +1,4 @@
-# SailorOps Color Palette
+﻿# Still Systems Color Palette
 
 ## Core Colors
 | Name | Hex | Usage |
@@ -21,3 +21,4 @@
 - Use Deep Navy as the default background.
 - Ops Blue should be used sparingly for emphasis.
 - Steel Silver is the default text color on dark backgrounds.
+

@@ -31,6 +31,8 @@ func Run() {
 		}
 	case "doctor", "dr":
 		doctor.RunChecks()
+	case "config", "cfg":
+		runConfig(os.Args[2:])
 	case "help", "-h", "--help":
 		printUsage()
 	default:
@@ -49,6 +51,7 @@ func printUsage() {
 	fmt.Println("  init, i    Scaffold a new project")
 	fmt.Println("  list, ls   List template variants")
 	fmt.Println("  doctor, dr Check environment health")
+	fmt.Println("  config, cfg Manage global preferences")
 	fmt.Println("  update, u  Update to latest version")
 	fmt.Println("  version, v Print version info")
 	

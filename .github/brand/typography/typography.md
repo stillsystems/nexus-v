@@ -1,4 +1,4 @@
-# SailorOps Typography
+﻿# Still Systems Typography
 
 ## Primary Typeface
 **Inter**  
@@ -19,3 +19,4 @@ Used for code, CLI output, and technical diagrams.
 - Avoid decorative fonts.
 - Use consistent line height (1.4–1.6).
 - Use JetBrains Mono for all code blocks and CLI examples.
+

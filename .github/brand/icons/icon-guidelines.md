@@ -1,4 +1,4 @@
-# SailorOps Icon Guidelines
+﻿# Still Systems Icon Guidelines
 
 ## Style
 - Thin‑line (2–2.5px)
@@ -10,3 +10,4 @@
 ## Usage
 - Ops Blue for active states
 - Steel Silver for default states
+

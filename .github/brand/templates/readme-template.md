@@ -1,4 +1,4 @@
-# ⚓ {PROJECT_NAME}
+﻿# 🧱 {PROJECT_NAME}
 
 **{A short, punchy one-sentence value proposition.}**  
 Build fast. Ship clean.
@@ -7,10 +7,10 @@ Build fast. Ship clean.
 
 ## 🧭 Philosophy
 
-{PROJECT_NAME} is built within the SailorOps ecosystem and follows our core principles:
+{PROJECT_NAME} is built within the Still Systems ecosystem and follows our core principles:
 - 🛡️ **Clarity over cleverness** — predictable behavior, no magic.
 - 📦 **Portability over complexity** — single binaries, no global state.
-- ⚓ **Durability over trends** — long‑term maintainability, minimal dependencies.
+- 🧱 **Durability over trends** — long‑term maintainability, minimal dependencies.
 
 ## 🚀 Features
 
@@ -22,12 +22,12 @@ Build fast. Ship clean.
 
 ### **Homebrew**
 ```bash
-brew install SailorOps/homebrew-tap/{project-name}
+brew install stillsystems/homebrew-tap/{project-name}
 ```
 
 ### **Scoop**
 ```powershell
-scoop bucket add sailorops https://github.com/SailorOps/scoop-bucket
+scoop bucket add stillsystems https://github.com/stillsystems/scoop-bucket
 scoop install {project-name}
 ```
 
@@ -40,7 +40,7 @@ scoop install {project-name}
 
 ## 🤝 Contributing
 
-We welcome contributions that align with our [Contribution Rules](https://github.com/SailorOps/.github/blob/main/brand/governance/contribution-rules.md). 
+We welcome contributions that align with our [Contribution Rules](https://github.com/stillsystems/.github/blob/main/brand/governance/contribution-rules.md). 
 
 1. Fork the repo.
 2. Create your feature branch.
@@ -50,4 +50,5 @@ We welcome contributions that align with our [Contribution Rules](https://github
 
 ---
 
-⚓ **SailorOps** — Modern developer tooling engineered for real‑world conditions.
+🧱 **Still Systems** — Modern developer tooling engineered for real‑world conditions.
+

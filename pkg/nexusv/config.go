@@ -57,6 +57,28 @@ func (c *Config) Validate() error {
 	return nil
 }
 
+func UserConfigPath() (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(home, ".nexusvrc.yaml"), nil
+}
+
+func (c *Config) Save() error {
+	path, err := UserConfigPath()
+	if err != nil {
+		return err
+	}
+
+	data, err := yaml.Marshal(c)
+	if err != nil {
+		return fmt.Errorf("failed to marshal config: %w", err)
+	}
+
+	return os.WriteFile(path, data, 0644)
+}
+
 func LoadConfig(targetDir string) (Config, error) {
 	var cfg Config
 
@@ -68,18 +90,18 @@ func LoadConfig(targetDir string) (Config, error) {
 	cfg.Telemetry.Session = true  // Internal default if enabled
 
 	// User-level config: ~/.nexusvrc.yaml
-	home, err := os.UserHomeDir()
-	if err == nil {
-		userCfg := filepath.Join(home, ".nexusvrc.yaml")
+	if userCfg, err := UserConfigPath(); err == nil {
 		if data, err := os.ReadFile(userCfg); err == nil {
 			_ = yaml.Unmarshal(data, &cfg)
 		}
 	}
 
 	// Project-level config: <targetDir>/.nexusvrc.yaml
-	projectCfg := filepath.Join(targetDir, ".nexusvrc.yaml")
-	if data, err := os.ReadFile(projectCfg); err == nil {
-		_ = yaml.Unmarshal(data, &cfg)
+	if targetDir != "" {
+		projectCfg := filepath.Join(targetDir, ".nexusvrc.yaml")
+		if data, err := os.ReadFile(projectCfg); err == nil {
+			_ = yaml.Unmarshal(data, &cfg)
+		}
 	}
 
 	// Environment variables override

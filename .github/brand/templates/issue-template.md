@@ -1,4 +1,4 @@
-## ⚓ Issue Report
+﻿## 🧱 Issue Report
 
 ### 🧭 Context
 - **Tool**: {Nexus-V, homebrew-nexusv, etc.}
@@ -9,7 +9,7 @@
 {Clearly describe the issue. What were you trying to do, and what actually happened?}
 
 ### 🚀 Expected Behavior
-{What should have happened according to the SailorOps philosophy?}
+{What should have happened according to the Still Systems philosophy?}
 
 ### 📉 Steps to Reproduce
 1. Run `command`
@@ -18,4 +18,5 @@
 
 ---
 
-⚓ **SailorOps** — Tools engineered for real-world conditions.
+🧱 **Still Systems** — Tools engineered for real-world conditions.
+

@@ -1,11 +1,11 @@
-# SailorOps Contribution Rules
+﻿# Still Systems Contribution Rules
 
-We value technical precision and operational clarity. Every contribution to a SailorOps project should feel intentional, minimal, and durable.
+We value technical precision and operational clarity. Every contribution to a Still Systems project should feel intentional, minimal, and durable.
 
 ## ⚖️ General Principles
 
 1. **Clarity Over Cleverness**: Code should be easy to audit. Avoid "magic" or overly complex abstractions that hide state.
-2. **Minimal Dependencies**: Before adding a dependency, ask if it can be solved with the standard library. SailorOps tools aim for a small footprint.
+2. **Minimal Dependencies**: Before adding a dependency, ask if it can be solved with the standard library. Still Systems tools aim for a small footprint.
 3. **Predictability**: Tools should behave the same way in every environment. Avoid global state or implicit configuration.
 4. **Binary Portability**: Prioritize architectures that support static linking and single-binary distribution.
 
@@ -25,4 +25,5 @@ We value technical precision and operational clarity. Every contribution to a Sa
 
 ---
 
-⚓ **Build for the long haul. Ship with precision.**
+🧱 **Build for the long haul. Ship with precision.**
+

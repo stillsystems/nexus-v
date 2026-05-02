@@ -1,6 +1,6 @@
-# SailorOps CLI Color Semantics
+﻿# Still Systems CLI Color Semantics
 
-To maintain a consistent experience across all SailorOps binaries, every tool must use the following color palette for standard output and TUI elements.
+To maintain a consistent experience across all Still Systems binaries, every tool must use the following color palette for standard output and TUI elements.
 
 ## 🎨 Standard States
 
@@ -19,5 +19,6 @@ To maintain a consistent experience across all SailorOps binaries, every tool mu
    - `✔` (Green) for Success
    - `⚠` (Yellow) for Warning
    - `✖` (Red) for Error
-2. **Contrast**: Always ensure text is readable against a dark navy or graphite background (the SailorOps default).
-3. **No-Color Support**: All SailorOps tools must respect the `NO_COLOR` environment variable and strip ANSI codes if present.
+2. **Contrast**: Always ensure text is readable against a dark navy or graphite background (the Still Systems default).
+3. **No-Color Support**: All Still Systems tools must respect the `NO_COLOR` environment variable and strip ANSI codes if present.
+

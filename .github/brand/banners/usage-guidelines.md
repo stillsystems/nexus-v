@@ -1,4 +1,4 @@
-# SailorOps Banner Guidelines
+﻿# Still Systems Banner Guidelines
 
 ## GitHub Banners
 - Aspect ratio: 5:1  
@@ -12,4 +12,5 @@
 
 ## Rules
 - Maintain consistent typography and color palette.
-- Avoid clutter; SailorOps is a minimalist brand.
+- Avoid clutter; Still Systems is a minimalist brand.
+

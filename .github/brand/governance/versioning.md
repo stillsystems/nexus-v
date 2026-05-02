@@ -1,4 +1,4 @@
-# SailorOps Versioning Guidelines
+﻿# Still Systems Versioning Guidelines
 
 We follow strict Semantic Versioning (SemVer) to ensure operational predictability for our users.
 
@@ -18,4 +18,5 @@ Example: `v1.0.0-beta.1`
 
 ---
 
-⚓ **SailorOps** — Tools engineered for real-world conditions.
+🧱 **Still Systems** — Tools engineered for real-world conditions.
+
