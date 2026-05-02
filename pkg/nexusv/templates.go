@@ -103,14 +103,15 @@ func listFromDir(dir string, embedded bool) ([]string, error) {
 
 // GenerateProject scaffolds a new project by rendering templates from one or more sources
 // into the target directory based on the provided Context.
-func GenerateProject(ctx Context, targetDir string) error {
+func GenerateProject(ctx Context, targetDir string) (*TemplateMetadata, error) {
+	var meta *TemplateMetadata
 	if ctx.Template == "" && ctx.CustomTemplateDir == "" {
 		ctx.Template = "default"
 	}
 
 	if !ctx.DryRun {
 		if err := os.MkdirAll(targetDir, 0o755); err != nil {
-			return fmt.Errorf("failed to create target directory: %w", err)
+			return nil, fmt.Errorf("failed to create target directory: %w", err)
 		}
 	}
 
@@ -124,19 +125,25 @@ func GenerateProject(ctx Context, targetDir string) error {
 	// Handle remote templates (Plugins)
 	if isGitURL(ctx.CustomTemplateDir) {
 		if !GitAvailable() {
-			return fmt.Errorf("git is not installed but is required for remote templates")
+			return nil, fmt.Errorf("git is not installed but is required for remote templates")
 		}
 		tmpDir, err := os.MkdirTemp("", "nexusv-tpl-*")
 		if err != nil {
-			return err
+			return nil, err
 		}
 		defer os.RemoveAll(tmpDir)
 
 		fmt.Printf("Cloning remote template: %s (ref: %s)...\n", ctx.CustomTemplateDir, ctx.TemplateRef)
 		if err := GitCloneWithRef(ctx.CustomTemplateDir, ctx.TemplateRef, tmpDir); err != nil {
-			return fmt.Errorf("failed to clone remote template: %w", err)
+			return nil, fmt.Errorf("failed to clone remote template: %w", err)
 		}
 		ctx.CustomTemplateDir = tmpDir
+	}
+
+	if ctx.CustomTemplateDir != "" {
+		if m, err := LoadTemplateMetadata(ctx.CustomTemplateDir); err == nil {
+			meta = m
+		}
 	}
 
 	var sources []source
@@ -172,7 +179,7 @@ func GenerateProject(ctx Context, targetDir string) error {
 			// Check if embedded path exists
 			if _, err := templateFS.ReadDir(src.path); err != nil {
 				if ctx.Template != "" && src.path == path.Join("files", ctx.Template) {
-					return fmt.Errorf("unknown template variant: %s", ctx.Template)
+					return nil, fmt.Errorf("unknown template variant: %s", ctx.Template)
 				}
 				continue
 			}
@@ -186,11 +193,11 @@ func GenerateProject(ctx Context, targetDir string) error {
 		}
 
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
-	return nil
+	return meta, nil
 }
 
 func processItem(rel, srcPath string, isDir bool, isLocal bool, targetDir string, ctx Context, seen map[string]bool) error {

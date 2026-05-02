@@ -94,7 +94,7 @@ func runInit(args []string) {
 	}()
 
 	spin.Start("Generating project...")
-	err = nexusv.GenerateProject(ctx, targetDir)
+	meta, err := nexusv.GenerateProject(ctx, targetDir)
 	spin.Stop()
 	signal.Stop(sigChan) // Stop listening for signals after generation
 
@@ -109,6 +109,16 @@ func runInit(args []string) {
 	if err != nil {
 		Error(err.Error())
 		os.Exit(1)
+	}
+
+	results := nexusv.ValidateProject(targetDir)
+	for _, res := range results {
+		for _, e := range res.Errors {
+			Warn(fmt.Sprintf("[%s] %s", res.File, e))
+		}
+		for _, w := range res.Warnings {
+			Info(fmt.Sprintf("[%s] %s", res.File, w))
+		}
 	}
 
 	if ctx.DryRun {
@@ -140,6 +150,13 @@ func runInit(args []string) {
 	}
 	if *openCode {
 		postHooks = append(postHooks, "code .")
+	}
+
+	if meta != nil && !*noHooks {
+		if len(meta.Hooks.Pre) > 0 {
+			Warn("Template defines pre-scaffold hooks, but generation is already underway. Consider moving these to post_scaffold.")
+		}
+		postHooks = append(postHooks, meta.Hooks.Post...)
 	}
 
 	if !*noHooks && len(postHooks) > 0 {

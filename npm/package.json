@@ -1,0 +1,21 @@
+{
+  "name": "nexus-v",
+  "version": "0.2.8",
+  "description": "A modern VS Code extension scaffolder with zero runtime dependencies — built in Go.",
+  "bin": {
+    "nexus-v": "bin/nexus-v"
+  },
+  "files": [
+    "bin/",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Still Systems",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stillsystems/nexus-v.git"
+  }
+}

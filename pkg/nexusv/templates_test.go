@@ -27,7 +27,7 @@ func TestGenerateProject(t *testing.T) {
 	}
 
 	target := filepath.Join(tempDir, "output")
-	if err := GenerateProject(ctx, target); err != nil {
+	if _, err := GenerateProject(ctx, target); err != nil {
 		t.Fatalf("GenerateProject failed: %v", err)
 	}
 
@@ -74,7 +74,7 @@ func TestGenerateVariants(t *testing.T) {
 			}
 
 			target := filepath.Join(tempDir, "output")
-			if err := GenerateProject(ctx, target); err != nil {
+			if _, err := GenerateProject(ctx, target); err != nil {
 				t.Fatalf("GenerateProject failed for variant %s: %v", v, err)
 			}
 
@@ -115,7 +115,7 @@ func TestZipSlipPrevention(t *testing.T) {
 		Template:   "language",
 	}
 
-	err := GenerateProject(ctx, target)
+	_, err := GenerateProject(ctx, target)
 	if err == nil {
 		t.Errorf("expected security error for path escaping, got nil")
 	} else if !strings.Contains(err.Error(), "security violation") {
