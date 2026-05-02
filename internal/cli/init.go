@@ -12,7 +12,7 @@ import (
 	"syscall"
 
 	"nexus-v/internal/prompts"
-	"nexus-v/internal/telemetry"
+	"nexus-v/internal/version"
 	"nexus-v/pkg/nexusv"
 )
 
@@ -73,7 +73,6 @@ func runInit(args []string) {
 
 	useGit := cfg.Defaults.Git && !*noGit
 
-	tel := telemetry.New(cfg.Telemetry.Enabled, cfg.Telemetry.Session, cfg.Telemetry.Local, cfg.Telemetry.Project)
 
 	if !*noHooks && len(cfg.Hooks.Pre) > 0 {
 		Info("Running pre-scaffold hooks...")
@@ -98,13 +97,6 @@ func runInit(args []string) {
 	spin.Stop()
 	signal.Stop(sigChan) // Stop listening for signals after generation
 
-	ev := telemetry.Event{
-		Template:   ctx.Template,
-		DryRun:     *dryRun,
-		Force:      *force,
-		ProjectDir: filepath.Base(targetDir),
-	}
-	tel.Record(ev)
 
 	if err != nil {
 		Error(err.Error())
@@ -127,6 +119,9 @@ func runInit(args []string) {
 	}
 
 	Success("Project created at " + filepath.Clean(targetDir))
+
+	// Send anonymous telemetry
+	nexusv.SendTelemetry(cfg, "init", ctx.Template, version.Version)
 
 	if useGit && nexusv.GitAvailable() {
 		Info("Initializing Git repository...")
@@ -243,6 +238,12 @@ func resolveContext(cfg nexusv.Config, name, id, desc, publisher, variant, templ
 		if !supported[ctx.License] {
 			return nexusv.Context{}, "", fmt.Errorf("unsupported license: %s", ctx.License)
 		}
+	}
+
+	// 6. Feature resolution (if not in a non-interactive mode)
+	meta, _ := nexusv.GetTemplateMetadata(ctx.Template, ctx.CustomTemplateDir)
+	if meta != nil && len(meta.Features) > 0 {
+		ctx.EnabledFeatures = prompts.AskFeatures(meta)
 	}
 
 	return ctx, resolvedTarget, nil

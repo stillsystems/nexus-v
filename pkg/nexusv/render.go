@@ -6,9 +6,16 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"text/template"
 	"time"
 )
+
+var bufferPool = sync.Pool{
+	New: func() interface{} {
+		return new(bytes.Buffer)
+	},
+}
 
 func renderTemplate(data []byte, name, outPath string, ctx Context) error {
 	tmpl, err := template.New(name).Funcs(template.FuncMap{
@@ -36,8 +43,11 @@ func renderTemplate(data []byte, name, outPath string, ctx Context) error {
 		return fmt.Errorf("failed to parse template: %w", err)
 	}
 
-	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, ctx); err != nil {
+	buf := bufferPool.Get().(*bytes.Buffer)
+	buf.Reset()
+	defer bufferPool.Put(buf)
+
+	if err := tmpl.Execute(buf, ctx); err != nil {
 		return fmt.Errorf("failed to render template: %w", err)
 	}
 

@@ -3,7 +3,15 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 export function activate(context: vscode.ExtensionContext) {
+    const controlProvider = new NexusControlProvider();
+    vscode.window.registerTreeDataProvider('nexusv.dashboard', controlProvider);
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('nexusv.refresh', () => controlProvider.refresh())
+    );
+
     const disposable = vscode.commands.registerCommand('nexus-v.createProject', () => {
+        // ... (existing code remains)
         const panel = vscode.window.createWebviewPanel(
             'nexusVScaffolder',
             'Nexus-V: New Project',
@@ -58,3 +66,52 @@ function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Web
 }
 
 export function deactivate() {}
+
+class NexusControlProvider implements vscode.TreeDataProvider<NexusItem> {
+    private _onDidChangeTreeData: vscode.EventEmitter<NexusItem | undefined | void> = new vscode.EventEmitter<NexusItem | undefined | void>();
+    readonly onDidChangeTreeData: vscode.Event<NexusItem | undefined | void> = this._onDidChangeTreeData.event;
+
+    refresh(): void {
+        this._onDidChangeTreeData.fire();
+    }
+
+    getTreeItem(element: NexusItem): vscode.TreeItem {
+        return element;
+    }
+
+    getChildren(element?: NexusItem): Thenable<NexusItem[]> {
+        if (element) {
+            return Promise.resolve(element.children || []);
+        } else {
+            return Promise.resolve([
+                new NexusItem('Project Status', vscode.TreeItemCollapsibleState.Expanded, 'dashboard', [
+                    new NexusItem('Engine: v0.2.8', vscode.TreeItemCollapsibleState.None, 'check'),
+                    new NexusItem('Health: Perfect', vscode.TreeItemCollapsibleState.None, 'shield')
+                ]),
+                new NexusItem('Quick Actions', vscode.TreeItemCollapsibleState.Expanded, 'zap', [
+                    new NexusItem('Create New Project', vscode.TreeItemCollapsibleState.None, 'add', undefined, {
+                        command: 'nexus-v.createProject',
+                        title: 'New Project'
+                    }),
+                    new NexusItem('Run Doctor', vscode.TreeItemCollapsibleState.None, 'pulse')
+                ])
+            ]);
+        }
+    }
+}
+
+class NexusItem extends vscode.TreeItem {
+    constructor(
+        public readonly label: string,
+        public readonly collapsibleState: vscode.TreeItemCollapsibleState,
+        public readonly iconName?: string,
+        public readonly children?: NexusItem[],
+        public readonly command?: vscode.Command
+    ) {
+        super(label, collapsibleState);
+        if (iconName) {
+            this.iconPath = new vscode.ThemeIcon(iconName);
+        }
+    }
+    contextValue = 'nexusItem';
+}

@@ -25,7 +25,16 @@ type Registry struct {
 // FetchRegistry retrieves the template index from a remote URL.
 func FetchRegistry(url string) (*Registry, error) {
 	client := &http.Client{Timeout: 10 * time.Second}
-	resp, err := client.Get(url)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// Add Still Systems telemetry headers
+	req.Header.Set("User-Agent", "Nexus-V/0.2.8 (Still Systems)")
+	req.Header.Set("X-Nexus-Version", "0.2.8")
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("network error fetching registry: %w", err)
 	}

@@ -33,7 +33,7 @@ func Start(port int) error {
 }
 
 func handleTemplates(w http.ResponseWriter, r *http.Request) {
-	templates, err := nexusv.ListTemplates()
+	templates, err := nexusv.GetAvailableTemplates()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -46,11 +46,12 @@ func handleTemplates(w http.ResponseWriter, r *http.Request) {
 }
 
 type GenerateRequest struct {
-	Name        string `json:"name"`
-	Identifier  string `json:"identifier"`
-	Publisher   string `json:"publisher"`
-	Description string `json:"description"`
-	Template    string `json:"template"`
+	Name            string          `json:"name"`
+	Identifier      string          `json:"identifier"`
+	Publisher       string          `json:"publisher"`
+	Description     string          `json:"description"`
+	Template        string          `json:"template"`
+	EnabledFeatures map[string]bool `json:"enabled_features"`
 }
 
 func handleGenerate(w http.ResponseWriter, r *http.Request) {
@@ -66,11 +67,12 @@ func handleGenerate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := nexusv.Context{
-		Name:        req.Name,
-		Identifier:  req.Identifier,
-		Description: req.Description,
-		Publisher:   req.Publisher,
-		Template:    req.Template,
+		Name:            req.Name,
+		Identifier:      req.Identifier,
+		Description:     req.Description,
+		Publisher:       req.Publisher,
+		Template:        req.Template,
+		EnabledFeatures: req.EnabledFeatures,
 	}
 
 	// We'll scaffold into a subfolder of the current directory for the web UI

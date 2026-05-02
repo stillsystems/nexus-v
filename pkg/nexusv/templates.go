@@ -7,7 +7,10 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"sync"
 	"text/template"
+
+	"gopkg.in/yaml.v3"
 )
 
 //go:embed files/**
@@ -26,6 +29,7 @@ type Context struct {
 	License           string
 	UserName          string
 	NodeVersion       string
+	EnabledFeatures   map[string]bool
 	Force             bool
 	DryRun            bool
 }
@@ -116,6 +120,9 @@ func GenerateProject(ctx Context, targetDir string) (*TemplateMetadata, error) {
 	}
 
 	seen := map[string]bool{}
+	var mu sync.Mutex
+	var wg sync.WaitGroup
+	errChan := make(chan error, 100)
 
 	type source struct {
 		path    string
@@ -160,9 +167,8 @@ func GenerateProject(ctx Context, targetDir string) (*TemplateMetadata, error) {
 			continue
 		}
 
-		var err error
 		if src.isLocal {
-			err = filepath.WalkDir(src.path, func(p string, d os.DirEntry, err error) error {
+			err := filepath.WalkDir(src.path, func(p string, d os.DirEntry, err error) error {
 				if err != nil {
 					return err
 				}
@@ -173,8 +179,18 @@ func GenerateProject(ctx Context, targetDir string) (*TemplateMetadata, error) {
 				rel, _ := filepath.Rel(src.path, p)
 				rel = filepath.ToSlash(rel)
 
-				return processItem(rel, p, d.IsDir(), true, targetDir, ctx, seen)
+				wg.Add(1)
+				go func(rel, p string, isDir bool) {
+					defer wg.Done()
+					if err := processItem(rel, p, isDir, true, targetDir, ctx, meta, seen, &mu); err != nil {
+						errChan <- err
+					}
+				}(rel, p, d.IsDir())
+				return nil
 			})
+			if err != nil {
+				return nil, err
+			}
 		} else {
 			// Check if embedded path exists
 			if _, err := templateFS.ReadDir(src.path); err != nil {
@@ -184,14 +200,30 @@ func GenerateProject(ctx Context, targetDir string) (*TemplateMetadata, error) {
 				continue
 			}
 
-			err = fsWalk(src.path, func(p string, isDir bool) error {
+			err := fsWalk(src.path, func(p string, isDir bool) error {
 				rel := strings.TrimPrefix(p, src.path)
 				rel = strings.TrimPrefix(rel, "/")
 
-				return processItem(rel, p, isDir, false, targetDir, ctx, seen)
+				wg.Add(1)
+				go func(rel, p string, isDir bool) {
+					defer wg.Done()
+					if err := processItem(rel, p, isDir, false, targetDir, ctx, meta, seen, &mu); err != nil {
+						errChan <- err
+					}
+				}(rel, p, isDir)
+				return nil
 			})
+			if err != nil {
+				return nil, err
+			}
 		}
+	}
 
+	wg.Wait()
+	close(errChan)
+
+	// Check for any errors during concurrent processing
+	for err := range errChan {
 		if err != nil {
 			return nil, err
 		}
@@ -200,11 +232,68 @@ func GenerateProject(ctx Context, targetDir string) (*TemplateMetadata, error) {
 	return meta, nil
 }
 
-func processItem(rel, srcPath string, isDir bool, isLocal bool, targetDir string, ctx Context, seen map[string]bool) error {
+// GetTemplateMetadata retrieves the metadata for a template variant or custom directory
+// without performing the full generation process.
+func GetTemplateMetadata(template, customDir string) (*TemplateMetadata, error) {
+	sourceDir := ""
+	if customDir != "" {
+		sourceDir = customDir
+	} else if template != "" {
+		sourceDir = filepath.Join("files", template)
+	}
+
+	if sourceDir == "" {
+		return nil, nil
+	}
+
+	// Check local filesystem first
+	if _, err := os.Stat(sourceDir); err == nil {
+		if meta, err := LoadTemplateMetadata(sourceDir); err == nil {
+			return meta, nil
+		}
+	}
+
+	// For embedded templates, we check the embedded FS.
+	embeddedPath := filepath.ToSlash(sourceDir)
+	if data, err := templateFS.ReadFile(path.Join(embeddedPath, "nexus-template.yaml")); err == nil {
+		var meta TemplateMetadata
+		if err := yaml.Unmarshal(data, &meta); err == nil {
+			return &meta, nil
+		}
+	}
+
+	return nil, nil
+}
+
+func isExcluded(rel string, meta *TemplateMetadata, ctx Context) bool {
+	if meta == nil {
+		return false
+	}
+	for _, f := range meta.Features {
+		if !ctx.EnabledFeatures[f.ID] {
+			for _, exPath := range f.Files {
+				exPath = strings.Trim(exPath, "/")
+				if rel == exPath || strings.HasPrefix(rel, exPath+"/") {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
+func processItem(rel, srcPath string, isDir bool, isLocal bool, targetDir string, ctx Context, meta *TemplateMetadata, seen map[string]bool, mu *sync.Mutex) error {
+	mu.Lock()
 	if seen[rel] {
+		mu.Unlock()
 		return nil
 	}
 	seen[rel] = true
+	mu.Unlock()
+
+	if isExcluded(rel, meta, ctx) {
+		return nil
+	}
 
 	outPath := filepath.Join(targetDir, filepath.FromSlash(rel))
 
@@ -246,6 +335,13 @@ func processItem(rel, srcPath string, isDir bool, isLocal bool, targetDir string
 		return os.MkdirAll(outPath, 0o755)
 	}
 
+	// Ensure parent directory exists (critical for concurrent writes)
+	if !ctx.DryRun {
+		if err := os.MkdirAll(filepath.Dir(outPath), 0o755); err != nil {
+			return err
+		}
+	}
+
 	outPath = strings.TrimSuffix(outPath, ".tmpl")
 
 	if !ctx.Force && !ctx.DryRun {
@@ -267,5 +363,45 @@ func isGitURL(path string) bool {
 	return strings.HasPrefix(path, "http://") ||
 		strings.HasPrefix(path, "https://") ||
 		strings.HasPrefix(path, "git@")
+}
+
+// AvailableTemplate represents a template variant with its metadata.
+type AvailableTemplate struct {
+	ID          string           `json:"id"`
+	Name        string           `json:"name"`
+	Description string           `json:"description"`
+	Language    string           `json:"language"`
+	Features    []Feature        `json:"features"`
+}
+
+// GetAvailableTemplates returns a list of all local templates with their metadata.
+func GetAvailableTemplates() ([]AvailableTemplate, error) {
+	names, err := ListTemplates()
+	if err != nil {
+		return nil, err
+	}
+
+	var result []AvailableTemplate
+	for _, name := range names {
+		tpl := AvailableTemplate{
+			ID:   name,
+			Name: name,
+		}
+
+		// Try to load metadata
+		meta, _ := GetTemplateMetadata(name, "")
+		if meta != nil {
+			if meta.Name != "" {
+				tpl.Name = meta.Name
+			}
+			tpl.Description = meta.Description
+			tpl.Language = meta.Language
+			tpl.Features = meta.Features
+		}
+
+		result = append(result, tpl)
+	}
+
+	return result, nil
 }
 

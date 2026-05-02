@@ -76,3 +76,37 @@ func sanitizeIdentifier(name string) string {
 	// Remove leading/trailing dashes
 	return strings.Trim(b.String(), "-")
 }
+// AskFeatures prompts the user for each feature defined in the template metadata.
+func AskFeatures(meta *nexusv.TemplateMetadata) map[string]bool {
+	if meta == nil || len(meta.Features) == 0 {
+		return nil
+	}
+
+	reader := bufio.NewReader(os.Stdin)
+	enabled := make(map[string]bool)
+
+	fmt.Println("\n🛠️ Template Features")
+	fmt.Println("-------------------------------------------")
+
+	for _, f := range meta.Features {
+		defaultStr := "Y/n"
+		if !f.Default {
+			defaultStr = "y/N"
+		}
+
+		fmt.Printf("? %s (%s): ", f.Prompt, defaultStr)
+		input, _ := reader.ReadString('\n')
+		input = strings.ToLower(strings.TrimSpace(input))
+
+		val := f.Default
+		if input == "y" || input == "yes" {
+			val = true
+		} else if input == "n" || input == "no" {
+			val = false
+		}
+		enabled[f.ID] = val
+	}
+	fmt.Println()
+
+	return enabled
+}

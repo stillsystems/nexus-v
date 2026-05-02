@@ -12,7 +12,15 @@ type TemplateMetadata struct {
 	Name        string     `yaml:"name"`
 	Description string     `yaml:"description"`
 	Language    string     `yaml:"language"`
+	Features    []Feature  `yaml:"features"`
 	Hooks       HookConfig `yaml:"hooks"`
+}
+
+type Feature struct {
+	ID          string   `yaml:"id"`
+	Prompt      string   `yaml:"prompt"`
+	Default     bool     `yaml:"default"`
+	Files       []string `yaml:"files"`
 }
 
 // LoadTemplateMetadata attempts to load a nexus-template.yaml from the given directory.

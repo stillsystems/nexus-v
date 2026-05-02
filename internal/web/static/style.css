@@ -152,8 +152,43 @@ textarea {
     font-weight: 500;
 }
 
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.feature-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--primary);
+}
+
+.feature-item input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.feature-item span {
+    font-size: 0.9rem;
+    font-weight: 400;
+}
+
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 /* Background Blobs */

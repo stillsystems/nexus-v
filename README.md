@@ -1,7 +1,7 @@
 # <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/stillsystems/.github/main/brand/logo.png"><img alt="Still Systems" src="https://raw.githubusercontent.com/stillsystems/.github/main/brand/logo.png" width="32" height="32"></picture> 🏗️ NEXUS-V
 
 **Modern developer tooling engineered for real-world conditions.**  
-Zero runtime dependencies. Dependency-light. Predictable.
+Zero runtime dependencies. Dependency-light. Predictable. High-performance.
 
 [![CI](https://github.com/stillsystems/nexus-v/actions/workflows/test.yml/badge.svg)](https://github.com/stillsystems/nexus-v/actions)
 [![License](https://img.shields.io/github/license/stillsystems/nexus-v?style=flat-square&color=111827)](LICENSE)
@@ -17,6 +17,27 @@ It embodies our core principles:
 - 🛡️ **Clarity over cleverness** — predictable behavior, no magic.
 - 📦 **Portability over complexity** — single static binaries, zero runtime dependencies.
 - 🧱 **Durability over trends** — built for long-term maintainability.
+- ⚡ **Performance by Design** — concurrent rendering engine for near-instant scaffolding.
+
+## 🚀 Key Features
+
+### 🎨 Visual Scaffolder (Web UI)
+Launch a premium, interactive web interface to browse templates and configure features with a live preview.
+```bash
+nexus-v serve
+```
+
+### 🩺 Project Doctor
+Ensure your environment and project manifest are healthy and compliant with VS Code standards.
+```bash
+nexus-v doctor
+```
+
+### 🧩 Conditional Scaffolding
+Define optional features and in-file logic in your templates. Nexus-V automatically handles file exclusion and dynamic content generation based on user selection.
+
+### 🗂️ VS Code Integration
+Manage your projects directly from the VS Code Activity Bar with our native sidebar extension.
 
 ## Installation / Quickstart
 
@@ -39,19 +60,14 @@ winget install stillsystems.nexusv
 
 ## Usage
 
-### Interactive Mode
+### Interactive CLI
 ```bash
 nexus-v init  # or simply: nexus-v i
 ```
 
-### Remote Templates
+### Remote Templates (Plugins)
 ```bash
 nexus-v init --template-dir https://github.com/user/my-template
-```
-
-### Check Health
-```bash
-nexus-v doctor
 ```
 
 ## Configuration
@@ -63,8 +79,9 @@ nexus-v doctor
 | `--license <type>`| `MIT`, `Apache-2.0`, `GPL-3.0`, `BSD-3-Clause`, `Unlicense` |
 | `--dry-run` | Preview files without writing them |
 | `--force` | Overwrite existing files |
-| `--install` | Automatically run `npm install` after scaffold |
 | `--git` | Automatically run `git init` after scaffold |
+| `serve` | Launch the Web-based Visual Scaffolder |
+| `doctor` | Check environment and project health |
 
 ## Contributing
 

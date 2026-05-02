@@ -5,7 +5,6 @@ import (
 	"os"
 	"runtime"
 
-	"nexus-v/internal/doctor"
 	"nexus-v/internal/update"
 	"nexus-v/internal/version"
 )
@@ -30,7 +29,7 @@ func Run() {
 			os.Exit(1)
 		}
 	case "doctor", "dr":
-		doctor.RunChecks()
+		runDoctor(os.Args[2:])
 	case "config", "cfg":
 		runConfig(os.Args[2:])
 	case "search":
