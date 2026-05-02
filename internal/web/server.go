@@ -67,14 +67,20 @@ func handleGenerate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Security: Ensure identifier and name are simple strings, not paths
-	if strings.Contains(req.Identifier, "..") || strings.Contains(req.Identifier, "/") || strings.Contains(req.Identifier, "\\") {
-		http.Error(w, "Invalid identifier: path traversal detected", http.StatusBadRequest)
-		return
+	// Security: Sanitize all input fields to prevent path traversal in any field used by templates
+	fields := map[string]string{
+		"Identifier": req.Identifier,
+		"Name":       req.Name,
+		"Description": req.Description,
+		"Publisher":   req.Publisher,
+		"Template":    req.Template,
 	}
-	if strings.Contains(req.Name, "..") || strings.Contains(req.Name, "/") || strings.Contains(req.Name, "\\") {
-		http.Error(w, "Invalid name: path traversal detected", http.StatusBadRequest)
-		return
+
+	for name, val := range fields {
+		if strings.Contains(val, "..") || strings.Contains(val, "/") || strings.Contains(val, "\\") {
+			http.Error(w, fmt.Sprintf("Invalid %s: path traversal detected", strings.ToLower(name)), http.StatusBadRequest)
+			return
+		}
 	}
 
 	ctx := nexusv.Context{

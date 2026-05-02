@@ -346,37 +346,41 @@ func processItem(rel, srcPath string, isDir bool, isLocal bool, targetDir string
 		return fmt.Errorf("security violation: path %q attempts to write outside of target directory %q", outPath, targetDir)
 	}
 
+	// Consolidate on the validated absolute path for all remaining operations
+	finalOutPath := absOut
+
 	if isDir {
 		if ctx.DryRun {
 			fmt.Println("[dir]  ", outPath)
 			return nil
 		}
-		return os.MkdirAll(absOut, 0o755)
+		return os.MkdirAll(finalOutPath, 0o755)
 	}
 
 	// Ensure parent directory exists (critical for concurrent writes)
 	if !ctx.DryRun {
-		parentDir := filepath.Dir(absOut)
+		parentDir := filepath.Dir(finalOutPath)
 		if err := os.MkdirAll(parentDir, 0o755); err != nil {
 			return fmt.Errorf("failed to create directory %q: %w", parentDir, err)
 		}
 	}
 
-	outPath = strings.TrimSuffix(outPath, ".tmpl")
+	// Handle .tmpl suffix and existing file checks on the final path
+	finalOutPath = strings.TrimSuffix(finalOutPath, ".tmpl")
 
 	if !ctx.Force && !ctx.DryRun {
-		if _, err := os.Stat(outPath); err == nil {
+		if _, err := os.Stat(finalOutPath); err == nil {
 			return fmt.Errorf(
 				"refusing to overwrite existing file: %s (use --force to override)",
-				outPath,
+				finalOutPath,
 			)
 		}
 	}
 
 	if isLocal {
-		return renderLocalFile(srcPath, outPath, ctx)
+		return renderLocalFile(srcPath, finalOutPath, ctx)
 	}
-	return renderEmbeddedFile(srcPath, outPath, ctx)
+	return renderEmbeddedFile(srcPath, finalOutPath, ctx)
 }
 
 func isGitURL(path string) bool {
