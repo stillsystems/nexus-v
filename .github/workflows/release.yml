@@ -6,7 +6,8 @@ on:
       - 'v*'
 
 jobs:
-  release:
+  engine-release:
+    name: Release Go Engine
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -15,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Required for GoReleaser to generate changelogs
+          fetch-depth: 0
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -35,3 +36,34 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GORELEASER_TOKEN: ${{ secrets.GORELEASER_TOKEN }}
+
+  vscode-release:
+    name: Release VS Code Extension
+    runs-on: ubuntu-latest
+    needs: engine-release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        working-directory: nexus-v-vscode
+        run: npm install
+
+      - name: Build Extension
+        working-directory: nexus-v-vscode
+        run: npm run build
+
+      - name: Publish to VS Code Marketplace
+        working-directory: nexus-v-vscode
+        run: npx vsce publish -p ${{ secrets.VSCE_PAT }}
+        continue-on-error: true # Don't fail the whole job if marketplace is down
+
+      - name: Publish to Open VSX
+        working-directory: nexus-v-vscode
+        run: npx ovsx publish -p ${{ secrets.OVSX_PAT }}
+        continue-on-error: true
