@@ -115,10 +115,15 @@ func GenerateProject(ctx Context, targetDir string) (*TemplateMetadata, error) {
 
 	// Sanitize and validate target directory at entry
 	targetDir = filepath.Clean(targetDir)
-	targetDir, err := filepath.Abs(targetDir)
+	if strings.Contains(targetDir, "..") {
+		return nil, fmt.Errorf("security violation: target directory cannot contain '..'")
+	}
+
+	absTarget, err := filepath.Abs(targetDir)
 	if err != nil {
 		return nil, fmt.Errorf("invalid target directory: %w", err)
 	}
+	targetDir = absTarget
 
 	// Basic safety check for target directory
 	if targetDir == "/" || targetDir == "C:\\" {

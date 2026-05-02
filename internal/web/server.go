@@ -66,6 +66,12 @@ func handleGenerate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Security: Ensure identifier is a simple name, not a path
+	if strings.Contains(req.Identifier, "/") || strings.Contains(req.Identifier, "\\") || strings.Contains(req.Identifier, "..") {
+		http.Error(w, "Invalid identifier: must be a simple folder name", http.StatusBadRequest)
+		return
+	}
+
 	ctx := nexusv.Context{
 		Name:            req.Name,
 		Identifier:      req.Identifier,
