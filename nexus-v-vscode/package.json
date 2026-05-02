@@ -29,8 +29,8 @@
     "test": "echo \"No tests yet\""
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
-    "@types/vscode": "^1.90.0"
+    "@types/node": "^25.6.0",
+    "@types/vscode": "^1.90.0",
+    "typescript": "^5.0.0"
   }
 }
-

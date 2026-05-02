@@ -18,7 +18,7 @@ export function activate(context: vscode.ExtensionContext) {
 
         // Handle messages from the webview
         panel.webview.onDidReceiveMessage(
-            message => {
+            (message: any) => {
                 switch (message.command) {
                     case 'generate':
                         vscode.window.showInformationMessage(`Generating project: ${message.data.name}...`);
