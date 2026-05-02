@@ -27,3 +27,20 @@ jobs:
         env:
           GOTOOLCHAIN: auto
         run: go test ./...
+
+  test-vscode:
+    name: Build VS Code Extension
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Dependencies
+        working-directory: nexus-v-vscode
+        run: npm install
+      - name: Build
+        working-directory: nexus-v-vscode
+        run: npm run build
