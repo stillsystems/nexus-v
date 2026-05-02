@@ -35,6 +35,8 @@ func Run() {
 		runConfig(os.Args[2:])
 	case "search":
 		runSearch(os.Args[2:])
+	case "serve":
+		runServe(os.Args[2:])
 	case "help", "-h", "--help":
 		printUsage()
 	default:
@@ -55,6 +57,7 @@ func printUsage() {
 	fmt.Println("  doctor, dr Check environment health")
 	fmt.Println("  config     Manage global user preferences")
 	fmt.Println("  search     Find templates in the Still Systems gallery")
+	fmt.Println("  serve      Launch the Visual Scaffolder (Web UI)")
 	fmt.Println("  update, u  Update to latest version")
 	fmt.Println("  version, v Print version info")
 	
