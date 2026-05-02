@@ -10,7 +10,7 @@ import (
 	"nexus-v/pkg/nexusv"
 )
 
-//go:embed static/*
+//go:embed static
 var staticFS embed.FS
 
 // Start launches the Visual Scaffolder web server.
