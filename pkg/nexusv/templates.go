@@ -114,9 +114,15 @@ func GenerateProject(ctx Context, targetDir string) (*TemplateMetadata, error) {
 	}
 
 	// Sanitize and validate target directory at entry
+	targetDir = filepath.Clean(targetDir)
 	targetDir, err := filepath.Abs(targetDir)
 	if err != nil {
 		return nil, fmt.Errorf("invalid target directory: %w", err)
+	}
+
+	// Basic safety check for target directory
+	if targetDir == "/" || targetDir == "C:\\" {
+		return nil, fmt.Errorf("security violation: refusing to scaffold into root directory")
 	}
 
 	if !ctx.DryRun {
