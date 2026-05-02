@@ -67,9 +67,13 @@ func handleGenerate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Security: Ensure identifier is a simple name, not a path
-	if strings.Contains(req.Identifier, "/") || strings.Contains(req.Identifier, "\\") || strings.Contains(req.Identifier, "..") {
-		http.Error(w, "Invalid identifier: must be a simple folder name", http.StatusBadRequest)
+	// Security: Ensure identifier and name are simple strings, not paths
+	if strings.Contains(req.Identifier, "..") || strings.Contains(req.Identifier, "/") || strings.Contains(req.Identifier, "\\") {
+		http.Error(w, "Invalid identifier: path traversal detected", http.StatusBadRequest)
+		return
+	}
+	if strings.Contains(req.Name, "..") || strings.Contains(req.Name, "/") || strings.Contains(req.Name, "\\") {
+		http.Error(w, "Invalid name: path traversal detected", http.StatusBadRequest)
 		return
 	}
 

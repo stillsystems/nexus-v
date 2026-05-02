@@ -351,13 +351,14 @@ func processItem(rel, srcPath string, isDir bool, isLocal bool, targetDir string
 			fmt.Println("[dir]  ", outPath)
 			return nil
 		}
-		return os.MkdirAll(outPath, 0o755)
+		return os.MkdirAll(absOut, 0o755)
 	}
 
 	// Ensure parent directory exists (critical for concurrent writes)
 	if !ctx.DryRun {
-		if err := os.MkdirAll(filepath.Dir(outPath), 0o755); err != nil {
-			return err
+		parentDir := filepath.Dir(absOut)
+		if err := os.MkdirAll(parentDir, 0o755); err != nil {
+			return fmt.Errorf("failed to create directory %q: %w", parentDir, err)
 		}
 	}
 
