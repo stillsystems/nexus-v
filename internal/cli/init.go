@@ -151,12 +151,16 @@ func runInit(args []string) {
 	if *openCode {
 		postHooks = append(postHooks, "code .")
 	}
-
 	if meta != nil && !*noHooks {
 		if len(meta.Hooks.Pre) > 0 {
 			Warn("Template defines pre-scaffold hooks, but generation is already underway. Consider moving these to post_scaffold.")
 		}
 		postHooks = append(postHooks, meta.Hooks.Post...)
+	}
+
+	langHooks, err := nexusv.LanguageSetup(targetDir, ctx, meta)
+	if err == nil {
+		postHooks = append(postHooks, langHooks...)
 	}
 
 	if !*noHooks && len(postHooks) > 0 {
@@ -188,6 +192,35 @@ func resolveContext(cfg nexusv.Config, name, id, desc, publisher, variant, templ
 	}
 	if resolvedTarget == "" {
 		resolvedTarget = ctx.Identifier
+	}
+
+	// 4. Registry resolution
+	if ctx.Template != "" && ctx.CustomTemplateDir == "" && ctx.Template != "default" && ctx.Template != "command" {
+		local, _ := nexusv.ListTemplates()
+		foundLocally := false
+		for _, l := range local {
+			if l == ctx.Template {
+				foundLocally = true
+				break
+			}
+		}
+
+		if !foundLocally {
+			Info("Template '" + ctx.Template + "' not found locally. Searching Still Systems gallery...")
+			reg, err := nexusv.FetchRegistry("https://raw.githubusercontent.com/stillsystems/.github/main/nexus-v-registry.json")
+			if err == nil {
+				for _, t := range reg.Templates {
+					if t.Name == ctx.Template {
+						Success("Found remote template: " + t.URL)
+						ctx.CustomTemplateDir = t.URL
+						if t.Variant != "" {
+							ctx.Template = t.Variant
+						}
+						break
+					}
+				}
+			}
+		}
 	}
 
 	// 4. System info

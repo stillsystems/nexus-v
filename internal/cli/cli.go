@@ -33,6 +33,8 @@ func Run() {
 		doctor.RunChecks()
 	case "config", "cfg":
 		runConfig(os.Args[2:])
+	case "search":
+		runSearch(os.Args[2:])
 	case "help", "-h", "--help":
 		printUsage()
 	default:
@@ -51,7 +53,8 @@ func printUsage() {
 	fmt.Println("  init, i    Scaffold a new project")
 	fmt.Println("  list, ls   List template variants")
 	fmt.Println("  doctor, dr Check environment health")
-	fmt.Println("  config, cfg Manage global preferences")
+	fmt.Println("  config     Manage global user preferences")
+	fmt.Println("  search     Find templates in the Still Systems gallery")
 	fmt.Println("  update, u  Update to latest version")
 	fmt.Println("  version, v Print version info")
 	

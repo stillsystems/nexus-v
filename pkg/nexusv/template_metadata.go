@@ -11,6 +11,7 @@ import (
 type TemplateMetadata struct {
 	Name        string     `yaml:"name"`
 	Description string     `yaml:"description"`
+	Language    string     `yaml:"language"`
 	Hooks       HookConfig `yaml:"hooks"`
 }
 
