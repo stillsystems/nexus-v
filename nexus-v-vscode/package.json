@@ -9,8 +9,31 @@
     "vscode": "^1.90.0"
   },
   "categories": [
+    "Programming Languages",
+    "Snippets",
     "Other"
   ],
+  "keywords": [
+    "nexus",
+    "scaffolding",
+    "boilerplate",
+    "templates",
+    "productivity",
+    "automation"
+  ],
+  "homepage": "https://github.com/stillsystems/nexus-v",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stillsystems/nexus-v"
+  },
+  "bugs": {
+    "url": "https://github.com/stillsystems/nexus-v/issues"
+  },
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#111827",
+    "theme": "dark"
+  },
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
@@ -18,6 +41,11 @@
       {
         "command": "nexus-v.createProject",
         "title": "Nexus-V: New Project",
+        "category": "Still Systems"
+      },
+      {
+        "command": "nexus-v.runDoctor",
+        "title": "Nexus-V: Run Doctor",
         "category": "Still Systems"
       },
       {

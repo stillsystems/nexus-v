@@ -10,6 +10,14 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('nexusv.refresh', () => controlProvider.refresh())
     );
 
+    context.subscriptions.push(
+        vscode.commands.registerCommand('nexus-v.runDoctor', () => {
+            const terminal = vscode.window.createTerminal("Nexus-V Doctor");
+            terminal.show();
+            terminal.sendText("nexus-v doctor");
+        })
+    );
+
     const disposable = vscode.commands.registerCommand('nexus-v.createProject', () => {
         // ... (existing code remains)
         const panel = vscode.window.createWebviewPanel(
@@ -93,7 +101,10 @@ class NexusControlProvider implements vscode.TreeDataProvider<NexusItem> {
                         command: 'nexus-v.createProject',
                         title: 'New Project'
                     }),
-                    new NexusItem('Run Doctor', vscode.TreeItemCollapsibleState.None, 'pulse')
+                    new NexusItem('Run Doctor', vscode.TreeItemCollapsibleState.None, 'pulse', undefined, {
+                        command: 'nexus-v.runDoctor',
+                        title: 'Run Doctor'
+                    })
                 ])
             ]);
         }
