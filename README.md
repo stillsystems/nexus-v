@@ -83,7 +83,28 @@ nexus-v init --template-dir https://github.com/user/my-template
 | `serve` | Launch the Web-based Visual Scaffolder |
 | `doctor` | Check environment and project health |
 
-## Contributing
+## 🛠️ Go API
+
+Nexus-V is engineered as both a powerful CLI and a reusable Go library (`pkg/nexusv`). This allows you to integrate the core scaffolding engine into your own Go-based daemons or tools.
+
+```go
+import "github.com/stillsystems/nexus-v/pkg/nexusv"
+
+func main() {
+    // Run diagnostics
+    nexusv.RunFullDoctor(".")
+
+    // Scaffold a project
+    nexusv.Scaffold(nexusv.Options{
+        Name: "MyProject",
+        TargetDir: "./output",
+        Template: "vscode-extension",
+    })
+}
+```
+
+## 🤝 Contributing
+
 
 Please refer to our [Global Contributing Guidelines](https://github.com/stillsystems/.github/blob/main/CONTRIBUTING.md).
 
