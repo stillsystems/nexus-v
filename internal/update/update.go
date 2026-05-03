@@ -186,7 +186,7 @@ func applyUpdate(url, checksumURL, targetName string) error {
 
 	success := false
 	defer func() {
-		tmpFile.Close()
+		_ = tmpFile.Close() // Best-effort cleanup
 		if !success {
 			os.Remove(tmpPath)
 		}
@@ -195,7 +195,10 @@ func applyUpdate(url, checksumURL, targetName string) error {
 	if _, err := tmpFile.Write(binaryData); err != nil {
 		return fmt.Errorf("failed to save update: %w", err)
 	}
-	tmpFile.Close()
+
+	if err := tmpFile.Close(); err != nil {
+		return fmt.Errorf("failed to finalize update file: %w", err)
+	}
 
 	// Windows-safe update strategy:
 	// 1. Rename running nexus-v.exe to nexus-v.exe.old
