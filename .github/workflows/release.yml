@@ -1,69 +1,29 @@
-name: Build & Release
-
+name: Release
 on:
   push:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
-  engine-release:
-    name: Release Go Engine
+  release:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.24'
-          check-latest: true
-
-      - name: Install Syft
-        uses: anchore/sbom-action/download-syft@v0
-
+          go-version: '1.22'
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v7
+        uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: "~> v2"
+          version: latest
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GORELEASER_TOKEN: ${{ secrets.GORELEASER_TOKEN }}
-
-  vscode-release:
-    name: Release VS Code Extension
-    runs-on: ubuntu-latest
-    needs: engine-release
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Install Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 20
-
-      - name: Install Dependencies
-        working-directory: nexus-v-vscode
-        run: npm install
-
-      - name: Build Extension
-        working-directory: nexus-v-vscode
-        run: npm run build
-
-      - name: Publish to VS Code Marketplace
-        working-directory: nexus-v-vscode
-        run: npx vsce publish -p ${{ secrets.VSCE_PAT }}
-        continue-on-error: true # Don't fail the whole job if marketplace is down
-
-      - name: Publish to Open VSX
-        working-directory: nexus-v-vscode
-        run: npx ovsx publish -p ${{ secrets.OVSX_PAT }}
-        continue-on-error: true
