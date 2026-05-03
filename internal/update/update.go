@@ -7,15 +7,46 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"runtime"
 	"strings"
+	"time"
 
 	"nexus-v/internal/version"
 )
 
-func verifyChecksum(data []byte, url, targetName string) error {
-	resp, err := http.Get(url)
+var httpClient = &http.Client{
+	Timeout: 30 * time.Second,
+}
+
+func validateURL(rawURL string) error {
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return fmt.Errorf("invalid URL: %w", err)
+	}
+
+	allowedHosts := []string{
+		"api.github.com",
+		"github.com",
+		"objects.githubusercontent.com",
+	}
+
+	for _, host := range allowedHosts {
+		if u.Host == host {
+			return nil
+		}
+	}
+
+	return fmt.Errorf("untrusted download host: %s", u.Host)
+}
+
+func verifyChecksum(data []byte, url string, targetName string) error {
+	if err := validateURL(url); err != nil {
+		return err
+	}
+
+	resp, err := httpClient.Get(url)
 	if err != nil {
 		return fmt.Errorf("failed to download checksums: %w", err)
 	}
@@ -73,7 +104,9 @@ func CheckAndApply() error {
 		fmt.Println("   It is recommended to use your package manager to update (e.g., 'brew upgrade nexus-v').")
 		fmt.Print("   Do you want to proceed anyway? (y/N): ")
 		var answer string
-		fmt.Scanln(&answer)
+		if _, err := fmt.Scanln(&answer); err != nil && err != io.EOF {
+			return fmt.Errorf("failed to read user input: %w", err)
+		}
 		if strings.ToLower(answer) != "y" {
 			fmt.Println("Update cancelled.")
 			return nil
@@ -82,7 +115,12 @@ func CheckAndApply() error {
 
 	fmt.Printf("Checking for updates for %s...\n", repo)
 
-	resp, err := http.Get(fmt.Sprintf("https://api.github.com/repos/%s/releases/latest", repo))
+	apiURL := fmt.Sprintf("https://api.github.com/repos/%s/releases/latest", repo)
+	if err := validateURL(apiURL); err != nil {
+		return err
+	}
+
+	resp, err := httpClient.Get(apiURL)
 	if err != nil {
 		return fmt.Errorf("failed to fetch latest release: %w", err)
 	}
@@ -119,7 +157,6 @@ func CheckAndApply() error {
 		ext = ".exe"
 	}
 
-	// Match pattern: nexus-v_<os>_<arch><ext>
 	targetName := fmt.Sprintf("nexus-v_%s_%s%s", runtime.GOOS, runtime.GOARCH, ext)
 	checksumName := "checksums.txt"
 	var checksumURL string
@@ -143,9 +180,6 @@ func CheckAndApply() error {
 	return applyUpdate(downloadURL, checksumURL, targetName)
 }
 
-// isManagedByPkgManager uses a best-effort heuristic to detect if the binary
-// was installed via a package manager. Note that this can fail if the user
-// uses custom prefixes or symlinks that don't follow standard patterns.
 func isManagedByPkgManager(path string) bool {
 	path = strings.ToLower(path)
 	return strings.Contains(path, "homebrew") ||
@@ -157,7 +191,11 @@ func isManagedByPkgManager(path string) bool {
 func applyUpdate(url, checksumURL, targetName string) error {
 	fmt.Println("Downloading update...")
 
-	resp, err := http.Get(url)
+	if err := validateURL(url); err != nil {
+		return err
+	}
+
+	resp, err := httpClient.Get(url)
 	if err != nil {
 		return fmt.Errorf("failed to download update: %w", err)
 	}
@@ -167,7 +205,6 @@ func applyUpdate(url, checksumURL, targetName string) error {
 		return fmt.Errorf("failed to download update: %s", resp.Status)
 	}
 
-	// Read binary into memory for checksum verification
 	binaryData, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("failed to read update data: %w", err)
@@ -183,7 +220,6 @@ func applyUpdate(url, checksumURL, targetName string) error {
 		return fmt.Errorf("failed to get executable path: %w", err)
 	}
 
-	// Create temp file in the same directory as the executable
 	tmpPath := exePath + ".new"
 	tmpFile, err := os.OpenFile(tmpPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o755)
 	if err != nil {
@@ -192,9 +228,9 @@ func applyUpdate(url, checksumURL, targetName string) error {
 
 	success := false
 	defer func() {
-		_ = tmpFile.Close() // Best-effort cleanup
+		_ = tmpFile.Close()
 		if !success {
-			_ = os.Remove(tmpPath) // Best-effort removal of failed update
+			_ = os.Remove(tmpPath)
 		}
 	}()
 
@@ -206,19 +242,14 @@ func applyUpdate(url, checksumURL, targetName string) error {
 		return fmt.Errorf("failed to finalize update file: %w", err)
 	}
 
-	// Windows-safe update strategy:
-	// 1. Rename running nexus-v.exe to nexus-v.exe.old
-	// 2. Rename nexus-v.exe.new to nexus-v.exe
-
 	oldPath := exePath + ".old"
-	_ = os.Remove(oldPath) // Remove previous backup if exists
+	_ = os.Remove(oldPath)
 
 	if err := os.Rename(exePath, oldPath); err != nil {
 		return fmt.Errorf("failed to backup current version: %w. Try running with elevated permissions.", err)
 	}
 
 	if err := os.Rename(tmpPath, exePath); err != nil {
-		// Restore backup if replacement fails
 		_ = os.Rename(oldPath, exePath)
 		return fmt.Errorf("failed to install new version: %w", err)
 	}
@@ -226,7 +257,5 @@ func applyUpdate(url, checksumURL, targetName string) error {
 	success = true
 	fmt.Println("🚀 Update successful! Please restart nexus-v.")
 
-	// Proactively suggest deleting the .old file or do it on next run?
-	// We'll leave it for now.
 	return nil
 }
