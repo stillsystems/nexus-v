@@ -30,8 +30,11 @@ func verifyChecksum(data []byte, url, targetName string) error {
 	var expectedHash string
 	for _, line := range lines {
 		if strings.Contains(line, targetName) {
-			expectedHash = strings.Fields(line)[0]
-			break
+			fields := strings.Fields(line)
+			if len(fields) > 0 {
+				expectedHash = fields[0]
+				break
+			}
 		}
 	}
 
@@ -60,7 +63,10 @@ type release struct {
 }
 
 func CheckAndApply() error {
-	exePath, _ := os.Executable()
+	exePath, err := os.Executable()
+	if err != nil {
+		return fmt.Errorf("failed to determine executable path: %w", err)
+	}
 	if isManagedByPkgManager(exePath) {
 		fmt.Println("⚠️  WARNING: nexus-v appears to be managed by a package manager (Homebrew, Scoop, or Winget).")
 		fmt.Println("   Updating via 'nexus-v update' may conflict with your package manager's state.")
@@ -188,7 +194,7 @@ func applyUpdate(url, checksumURL, targetName string) error {
 	defer func() {
 		_ = tmpFile.Close() // Best-effort cleanup
 		if !success {
-			os.Remove(tmpPath)
+			_ = os.Remove(tmpPath) // Best-effort removal of failed update
 		}
 	}()
 
