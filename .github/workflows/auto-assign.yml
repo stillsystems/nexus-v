@@ -1,10 +1,11 @@
 name: Auto Assign
-
 on:
   pull_request:
-    types: [opened]
-  issues:
-    types: [opened]
+    types: [opened, ready_for_review]
+
+permissions:
+  pull-requests: write
+  contents: read
 
 jobs:
   assign:
@@ -18,5 +19,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              assignees: ['billykidd-stillsystems']
+              assignees: ['billykidd']
             })
