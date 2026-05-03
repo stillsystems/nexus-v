@@ -1,19 +1,21 @@
 name: Test
-
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
-jobs:
-  go-ci:
-    uses: stillsystems/.github/.github/workflows/reusable-go-ci.yml@main
-    with:
-      go-version: '1.24.x'
+permissions:
+  contents: read
 
-  vscode-ci:
-    uses: stillsystems/.github/.github/workflows/reusable-node-ci.yml@main
-    with:
-      node-version: '20'
-      working-directory: 'nexus-v-vscode'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: 'npm'
+      - run: npm ci
+      - run: npm test
