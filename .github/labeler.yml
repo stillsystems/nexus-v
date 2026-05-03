@@ -1,0 +1,21 @@
+# Labeler configuration
+"area: core":
+  - any: ['pkg/nexusv/**']
+
+"area: cli":
+  - any: ['cmd/nexus-v/**']
+
+"area: templates":
+  - any: ['templates/**']
+
+"area: vscode":
+  - any: ['nexus-v-vscode/**']
+
+"area: documentation":
+  - any: ['**/*.md', 'docs/**']
+
+"area: github-actions":
+  - any: ['.github/workflows/**']
+
+"area: tests":
+  - any: ['**/*_test.go', '**/*.test.ts', 'tests/**']
