@@ -18,8 +18,8 @@ func runSearch(args []string) {
 		query = searchCmd.Arg(0)
 	}
 
-	// Registry URL is hardcoded for now, pointing to the Still Systems official index.
-	registryURL := "https://raw.githubusercontent.com/stillsystems/.github/main/nexus-v-registry.json"
+	// Official Still Systems registry index
+	registryURL := "https://raw.githubusercontent.com/stillsystems/nexus-registry/main/templates.json"
 
 	Info("Fetching template registry...")
 	reg, err := nexusv.FetchRegistry(registryURL)

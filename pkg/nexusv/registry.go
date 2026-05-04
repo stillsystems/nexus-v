@@ -10,16 +10,17 @@ import (
 
 // RegistryTemplate defines the structure of a template entry in the remote registry.
 type RegistryTemplate struct {
+	ID          string   `json:"id"`
 	Name        string   `json:"name"`
 	Description string   `json:"description"`
 	URL         string   `json:"url"`
-	Variant     string   `json:"variant"`
+	Language    string   `json:"language"`
 	Tags        []string `json:"tags"`
 }
 
 // Registry represents the collection of templates available in the Still Systems ecosystem.
 type Registry struct {
-	Templates []RegistryTemplate `json:"templates"`
+	Templates []RegistryTemplate
 }
 
 // FetchRegistry retrieves the template index from a remote URL.
@@ -44,12 +45,12 @@ func FetchRegistry(url string) (*Registry, error) {
 		return nil, fmt.Errorf("registry server returned error: %s", resp.Status)
 	}
 
-	var reg Registry
-	if err := json.NewDecoder(resp.Body).Decode(&reg); err != nil {
+	var templates []RegistryTemplate
+	if err := json.NewDecoder(resp.Body).Decode(&templates); err != nil {
 		return nil, fmt.Errorf("failed to parse registry data: %w", err)
 	}
 
-	return &reg, nil
+	return &Registry{Templates: templates}, nil
 }
 
 // Search filters the registry templates based on a keyword match in name or description.
