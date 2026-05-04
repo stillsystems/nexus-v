@@ -12,12 +12,14 @@ type TemplateMetadata struct {
 	Name        string     `yaml:"name"`
 	Description string     `yaml:"description"`
 	Language    string     `yaml:"language"`
+	Version     string     `yaml:"version"`
 	Features    []Feature  `yaml:"features"`
 	Hooks       HookConfig `yaml:"hooks"`
 }
 
 type Feature struct {
 	ID          string   `yaml:"id"`
+	Name        string   `yaml:"name"`
 	Prompt      string   `yaml:"prompt"`
 	Default     bool     `yaml:"default"`
 	Files       []string `yaml:"files"`

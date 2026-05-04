@@ -114,4 +114,52 @@ func validateTSConfig(path string) (*ValidationResult, error) {
 	return res, nil
 }
 
-// Added strings import manually in the next step or here
+// ValidateTemplate performs deep-linting on a Nexus-V template repository.
+func ValidateTemplate(dir string) []ValidationResult {
+	var results []ValidationResult
+
+	// Validate nexus-template.yaml
+	meta, err := LoadTemplateMetadata(dir)
+	if err != nil {
+		results = append(results, ValidationResult{
+			File:   "nexus-template.yaml",
+			Errors: []string{fmt.Sprintf("Failed to load metadata: %v", err)},
+		})
+		return results
+	}
+
+	if meta == nil {
+		results = append(results, ValidationResult{
+			File:   "nexus-template.yaml",
+			Errors: []string{"Missing required file: nexus-template.yaml"},
+		})
+		return results
+	}
+
+	res := &ValidationResult{File: "nexus-template.yaml"}
+
+	if meta.Name == "" {
+		res.Errors = append(res.Errors, "Missing required field: \"name\"")
+	}
+	if meta.Description == "" {
+		res.Warnings = append(res.Warnings, "Recommended field missing: \"description\"")
+	}
+	if meta.Language == "" {
+		res.Errors = append(res.Errors, "Missing required field: \"language\"")
+	}
+
+	for i, feature := range meta.Features {
+		if feature.ID == "" {
+			res.Errors = append(res.Errors, fmt.Sprintf("Feature at index %d is missing \"id\"", i))
+		}
+		if len(feature.Files) == 0 {
+			res.Warnings = append(res.Warnings, fmt.Sprintf("Feature %q has no associated files", feature.ID))
+		}
+	}
+
+	if len(res.Errors) > 0 || len(res.Warnings) > 0 {
+		results = append(results, *res)
+	}
+
+	return results
+}

@@ -1,131 +1,117 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const templateSelect = document.getElementById('template');
-    const generateBtn = document.getElementById('generate-btn');
-    const statusPanel = document.getElementById('status-panel');
-    const statusText = document.getElementById('status-text');
-    const featuresSection = document.getElementById('features-section');
-    const featuresList = document.getElementById('features-list');
+  const templateList = document.getElementById('template-list');
+  const featuresSection = document.getElementById('features-section');
+  const featuresGrid = document.getElementById('features-grid');
+  const genForm = document.getElementById('gen-form');
+  const status = document.getElementById('status');
 
-    let templatesData = [];
+  let templates = [];
+  let selectedTemplate = null;
+  let enabledFeatures = {};
 
-    const nameInput = document.getElementById('name');
-    const idInput = document.getElementById('identifier');
+  // 1. Fetch templates
+  try {
+    const res = await fetch('/api/templates');
+    const data = await res.json();
+    templates = data.templates;
+    renderTemplates();
+  } catch (err) {
+    showStatus('Failed to load templates. Is the server running?', 'error');
+  }
 
-    function slugify(text) {
-        return text.toString().toLowerCase()
-            .replace(/\s+/g, '-')
-            .replace(/[^\w\-]+/g, '')
-            .replace(/\-\-+/g, '-')
-            .replace(/^-+/, '')
-            .replace(/-+$/, '');
+  function renderTemplates() {
+    templateList.innerHTML = '';
+    templates.forEach(tpl => {
+      const item = document.createElement('div');
+      item.className = 'template-item';
+      if (selectedTemplate && selectedTemplate.id === tpl.id) item.classList.add('active');
+      
+      item.innerHTML = `
+        <div class="template-info">
+          <h4>${tpl.name}</h4>
+          <p>${tpl.language || 'Multi-purpose'}</p>
+        </div>
+        <div style="font-size: 1.2rem;">🧱</div>
+      `;
+
+      item.onclick = () => selectTemplate(tpl);
+      templateList.appendChild(item);
+    });
+  }
+
+  function selectTemplate(tpl) {
+    selectedTemplate = tpl;
+    enabledFeatures = {};
+    renderTemplates();
+    renderFeatures();
+  }
+
+  function renderFeatures() {
+    if (!selectedTemplate || !selectedTemplate.features || selectedTemplate.features.length === 0) {
+      featuresSection.style.display = 'none';
+      return;
     }
 
-    nameInput.addEventListener('input', () => {
-        if (!idInput.dataset.touched) {
-            idInput.value = slugify(nameInput.value);
-        }
-    });
+    featuresSection.style.display = 'block';
+    featuresGrid.innerHTML = '';
+    
+    selectedTemplate.features.forEach(feat => {
+      const label = document.createElement('label');
+      label.className = 'feature-toggle';
+      
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = !!enabledFeatures[feat.id];
+      checkbox.onchange = (e) => {
+        enabledFeatures[feat.id] = e.target.checked;
+      };
 
-    idInput.addEventListener('input', () => {
-        idInput.dataset.touched = "true";
+      label.appendChild(checkbox);
+      label.append(feat.name);
+      featuresGrid.appendChild(label);
     });
+  }
 
-    // Fetch templates on load
+  // 2. Handle Generation
+  genForm.onsubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedTemplate) {
+      showStatus('Please select a template first.', 'error');
+      return;
+    }
+
+    const payload = {
+      name: document.getElementById('name').value,
+      identifier: document.getElementById('identifier').value,
+      publisher: document.getElementById('publisher').value || 'stillsystems',
+      description: document.getElementById('description').value,
+      template: selectedTemplate.id,
+      enabled_features: enabledFeatures
+    };
+
+    showStatus('🚀 Generating project...', '');
+
     try {
-        const response = await fetch('/api/templates');
-        const data = await response.json();
-        templatesData = data.templates;
-        
-        templateSelect.innerHTML = '';
-        templatesData.forEach(t => {
-            const option = document.createElement('option');
-            option.value = t.id;
-            option.textContent = t.name;
-            templateSelect.appendChild(option);
-        });
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
 
-        // Initialize features for first template
-        if (templatesData.length > 0) {
-            renderFeatures(templatesData[0]);
-        }
+      const data = await res.json();
+      if (res.ok) {
+        showStatus(`✨ ${data.message}`, 'success');
+      } else {
+        showStatus(`Error: ${data.error || 'Unknown error'}`, 'error');
+      }
     } catch (err) {
-        console.error('Failed to load templates:', err);
+      showStatus(`Network Error: ${err.message}`, 'error');
     }
+  };
 
-    templateSelect.addEventListener('change', () => {
-        const selected = templatesData.find(t => t.id === templateSelect.value);
-        renderFeatures(selected);
-    });
-
-    function renderFeatures(template) {
-        featuresList.innerHTML = '';
-        if (!template || !template.features || template.features.length === 0) {
-            featuresSection.classList.add('hidden');
-            return;
-        }
-
-        featuresSection.classList.remove('hidden');
-        template.features.forEach(f => {
-            const div = document.createElement('div');
-            div.className = 'feature-item';
-            div.innerHTML = `
-                <input type="checkbox" id="feat-${f.id}" ${f.default ? 'checked' : ''} data-feature-id="${f.id}">
-                <span>${f.prompt}</span>
-            `;
-            div.addEventListener('click', (e) => {
-                if (e.target.tagName !== 'INPUT') {
-                    const cb = div.querySelector('input');
-                    cb.checked = !cb.checked;
-                }
-            });
-            featuresList.appendChild(div);
-        });
-    }
-
-    // Handle Generation
-    generateBtn.addEventListener('click', async () => {
-        const enabledFeatures = {};
-        featuresList.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-            enabledFeatures[cb.dataset.featureId] = cb.checked;
-        });
-
-        const payload = {
-            name: document.getElementById('name').value,
-            identifier: document.getElementById('identifier').value,
-            publisher: document.getElementById('publisher').value,
-            description: document.getElementById('description').value,
-            template: templateSelect.value,
-            enabled_features: enabledFeatures
-        };
-
-        if (!payload.name || !payload.identifier) {
-            alert('Please fill in at least the Project Name and Identifier.');
-            return;
-        }
-
-        generateBtn.disabled = true;
-        generateBtn.textContent = 'Scaffolding...';
-
-        try {
-            const response = await fetch('/api/generate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            const data = await response.json();
-            
-            if (response.ok) {
-                statusPanel.classList.remove('hidden');
-                statusText.textContent = `🧱 Success! ${data.message}`;
-            } else {
-                throw new Error(data.message || 'Generation failed');
-            }
-        } catch (err) {
-            alert('Error: ' + err.message);
-        } finally {
-            generateBtn.disabled = false;
-            generateBtn.textContent = 'Generate Project';
-        }
-    });
+  function showStatus(msg, type) {
+    status.textContent = msg;
+    status.className = type;
+    status.style.display = 'block';
+  }
 });

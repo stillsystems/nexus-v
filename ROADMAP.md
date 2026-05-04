@@ -32,10 +32,10 @@ This document outlines the planned trajectory for **Nexus-V**. Our priority is a
 *   [x] **Production Documentation**: Refined user guides and feature showcases.
 
 ## 🔵 Phase 6: Ecosystem & Community (Upcoming)
-*   **Template-for-Templates**: A dedicated variant to scaffold new Nexus-V template repositories.
-*   **Nexus-V Linter Action**: A GitHub Action for automated template validation and linting.
-*   **Nexus Hub**: A public marketplace for community-driven templates.
-*   **Template Logic DSL**: A simplified syntax for complex conditional scaffolding.
+*   [x] **Template-for-Templates**: A dedicated variant to scaffold new Nexus-V template repositories.
+*   [x] **Nexus-V Linter Action**: A GitHub Action for automated template validation and linting.
+*   [ ] **Nexus Hub**: A public marketplace for community-driven templates.
+*   [ ] **Template Logic DSL**: A simplified syntax for complex conditional scaffolding.
 
 ## 🟣 Phase 7: The Visionary Horizon (Long-term)
 *   **Nexus Native**: A standalone desktop application for visual project management.

@@ -18,6 +18,7 @@ var bufferPool = sync.Pool{
 }
 
 func renderTemplate(data []byte, name, outPath string, ctx Context) error {
+	content := preProcessDSL(string(data))
 	tmpl, err := template.New(name).Funcs(template.FuncMap{
 		"currentYear": func() int {
 			return time.Now().Year()
@@ -38,7 +39,7 @@ func renderTemplate(data []byte, name, outPath string, ctx Context) error {
 				return "(No license text available for " + l + ")"
 			}
 		},
-	}).Parse(string(data))
+	}).Parse(content)
 	if err != nil {
 		return fmt.Errorf("failed to parse template: %w", err)
 	}
@@ -96,4 +97,67 @@ func renderLocalFile(srcPath, outPath string, ctx Context) error {
 		return fmt.Errorf("failed to read local template: %w", err)
 	}
 	return renderTemplate(data, filepath.Base(srcPath), outPath, ctx)
+}
+
+// preProcessDSL translates the simplified Nexus-V DSL into standard Go templates.
+func preProcessDSL(input string) string {
+	// [IF feature] -> {{ if .EnabledFeatures.feature }}
+	// [ELSE] -> {{ else }}
+	// [END] -> {{ end }}
+	// [VAR name] -> {{ .name }}
+	
+	output := input
+	
+	// Handle [IF feature]
+	output = strings.ReplaceAll(output, "[IF ", "{{ if .EnabledFeatures.")
+	output = strings.ReplaceAll(output, "[IF", "{{ if .EnabledFeatures.") // catch case without space if it happens
+	
+	// Handle closing bracket for IF
+	// Note: This is a simplistic approach; a regex would be better for [IF feature] specifically.
+	// But let's try a more robust regex-based approach.
+	return runRegexDSL(output)
+}
+
+func runRegexDSL(input string) string {
+	// We'll use a more targeted replacement to avoid mangling actual text.
+	// [IF feature] -> {{ if .EnabledFeatures.feature }}
+	// [ELSE] -> {{ else }}
+	// [END] -> {{ end }}
+	// [VAR Name] -> {{ .Name }}
+	
+	res := input
+	
+	// [IF feature]
+	res = strings.ReplaceAll(res, "[ELSE]", "{{ else }}")
+	res = strings.ReplaceAll(res, "[END]", "{{ end }}")
+	
+	// Using a simple loop for [IF] and [VAR] since Go regex doesn't support named backrefs easily in ReplaceAllString
+	// Actually, we can use strings.NewReplacer or just handle [IF ...] with a custom loop.
+	
+	lines := strings.Split(res, "\n")
+	for i, line := range lines {
+		// Replace [IF feature]
+		if strings.Contains(line, "[IF ") {
+			start := strings.Index(line, "[IF ")
+			end := strings.Index(line[start:], "]")
+			if end != -1 {
+				feature := line[start+4 : start+end]
+				feature = strings.TrimSpace(feature)
+				lines[i] = line[:start] + "{{ if .EnabledFeatures." + feature + " }}" + line[start+end+1:]
+			}
+		}
+		
+		// Replace [VAR name]
+		if strings.Contains(line, "[VAR ") {
+			start := strings.Index(line, "[VAR ")
+			end := strings.Index(line[start:], "]")
+			if end != -1 {
+				varName := line[start+5 : start+end]
+				varName = strings.TrimSpace(varName)
+				lines[i] = line[:start] + "{{ ." + varName + " }}" + line[start+end+1:]
+			}
+		}
+	}
+	
+	return strings.Join(lines, "\n")
 }

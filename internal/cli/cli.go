@@ -30,6 +30,12 @@ func Run() {
 		}
 	case "doctor", "dr":
 		runDoctor(os.Args[2:])
+	case "validate", "lint":
+		runValidate(os.Args[2:])
+	case "generate":
+		runGenerate(os.Args[2:])
+	case "publish":
+		runPublish(os.Args[2:])
 	case "config", "cfg":
 		runConfig(os.Args[2:])
 	case "search":
@@ -54,6 +60,9 @@ func printUsage() {
 	fmt.Println("  init, i    Scaffold a new project")
 	fmt.Println("  list, ls   List template variants")
 	fmt.Println("  doctor, dr Check environment health")
+	fmt.Println("  validate   Lint and validate template structure")
+	fmt.Println("  generate   Generate a custom template from an AI prompt")
+	fmt.Println("  publish    Submit a template to the Still Systems registry")
 	fmt.Println("  config     Manage global user preferences")
 	fmt.Println("  search     Find templates in the Still Systems gallery")
 	fmt.Println("  serve      Launch the Visual Scaffolder (Web UI)")
