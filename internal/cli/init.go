@@ -202,15 +202,12 @@ func resolveContext(cfg nexusv.Config, name, id, desc, publisher, variant, templ
 
 		if !foundLocally {
 			Info("Template '" + ctx.Template + "' not found locally. Searching Still Systems gallery...")
-			reg, err := nexusv.FetchRegistry("https://raw.githubusercontent.com/stillsystems/.github/main/nexus-v-registry.json")
+			reg, err := nexusv.FetchRegistry("https://raw.githubusercontent.com/stillsystems/nexus-registry/main/templates.json")
 			if err == nil {
 				for _, t := range reg.Templates {
-					if t.Name == ctx.Template {
+					if t.Name == ctx.Template || t.ID == ctx.Template {
 						Success("Found remote template: " + t.URL)
 						ctx.CustomTemplateDir = t.URL
-						if t.Variant != "" {
-							ctx.Template = t.Variant
-						}
 						break
 					}
 				}
