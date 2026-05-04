@@ -54,12 +54,17 @@ func TestLoadConfig(t *testing.T) {
 	})
 
 	t.Run("Project Level Config", func(t *testing.T) {
-		tmpDir, _ := os.MkdirTemp("", "nexusv-proj-*")
+		tmpDir, err := os.MkdirTemp("", "nexusv-proj-*")
+		if err != nil {
+			t.Fatalf("failed to create temp dir: %v", err)
+		}
 		defer os.RemoveAll(tmpDir)
 
 		projCfg := filepath.Join(tmpDir, ".nexusvrc.yaml")
 		content := "defaults:\n  license: Apache-2.0\n  variant: multi-command"
-		os.WriteFile(projCfg, []byte(content), 0644)
+		if err := os.WriteFile(projCfg, []byte(content), 0644); err != nil {
+			t.Fatalf("failed to write test config: %v", err)
+		}
 
 		cfg, err := LoadConfig(tmpDir)
 		if err != nil {

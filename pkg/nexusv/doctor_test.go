@@ -22,7 +22,9 @@ func TestRunFullDoctor(t *testing.T) {
 
 	// Case 1: Invalid package.json
 	pkgPath := filepath.Join(tempDir, "package.json")
-	os.WriteFile(pkgPath, []byte("{invalid json"), 0644)
+	if err := os.WriteFile(pkgPath, []byte("{invalid json"), 0644); err != nil {
+		t.Fatalf("failed to write test file: %v", err)
+	}
 	result = RunFullDoctor(tempDir)
 	foundManifestError := false
 	for _, issue := range result.Issues {
@@ -36,7 +38,9 @@ func TestRunFullDoctor(t *testing.T) {
 	}
 
 	// Case 2: Missing vital fields
-	os.WriteFile(pkgPath, []byte(`{"name": "test"}`), 0644)
+	if err := os.WriteFile(pkgPath, []byte(`{"name": "test"}`), 0644); err != nil {
+		t.Fatalf("failed to write test file: %v", err)
+	}
 	result = RunFullDoctor(tempDir)
 	foundWarning := false
 	for _, issue := range result.Issues {

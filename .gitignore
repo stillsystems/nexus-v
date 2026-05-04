@@ -1,6 +1,6 @@
 # Build output
-nexus-v
-nexus-v.exe
+/nexus-v
+/nexus-v.exe
 *.exe
 *.out
 *.bin

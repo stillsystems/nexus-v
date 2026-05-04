@@ -147,7 +147,6 @@ func fixMissingTool(tool string) error {
 	}
 	return nil
 }
-
 func fixMissingManifestField(dir, field string) error {
 	pkgPath := filepath.Join(dir, "package.json")
 	data, err := os.ReadFile(pkgPath)

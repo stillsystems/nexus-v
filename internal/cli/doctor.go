@@ -16,7 +16,7 @@ func runDoctor(args []string) {
 	}
 
 	cwd, _ := os.Getwd()
-	fmt.Printf("%s🩺 NEXUS-V Doctor (%s)%s\n", Bold, nexusv.GetSystemInfo(), Reset)
+	fmt.Printf("%s\U0001fa7a NEXUS-V Doctor (%s)%s\n", Bold, nexusv.GetSystemInfo(), Reset)
 	fmt.Println("-------------------------------------------")
 
 	result := nexusv.RunFullDoctor(cwd)

@@ -47,8 +47,6 @@ func TestGitWorkflow(t *testing.T) {
 	}
 
 	// Test GitFirstCommit
-	// Note: This might fail if git user.name/email are not set.
-	// We'll set them for the test if possible.
 	setupGitUser(tempDir)
 
 	if err := GitFirstCommit(tempDir); err != nil {
@@ -60,10 +58,10 @@ func setupGitUser(dir string) {
 	// Set local config for the test repo
 	cmd1 := execCommand("git", "config", "user.email", "test@example.com")
 	cmd1.Dir = dir
-	cmd1.Run()
+	_ = cmd1.Run() // Best effort for setup
 	cmd2 := execCommand("git", "config", "user.name", "Test User")
 	cmd2.Dir = dir
-	cmd2.Run()
+	_ = cmd2.Run() // Best effort for setup
 }
 
 // execCommand is a helper to allow easier testing if we wanted to mock,
