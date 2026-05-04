@@ -1,11 +1,14 @@
 # .goreleaser.yaml
 version: 2
 
+
 project_name: nexus-v
+
 
 before:
   hooks:
     - go mod tidy
+
 
 builds:
   - id: archive
@@ -18,8 +21,9 @@ builds:
     goarch:
       - amd64
       - arm64
-    main: ./cmd
+    main: ./cmd/nexus-v
     binary: nexus-v
+
 
   - id: raw
     env:
@@ -31,93 +35,5 @@ builds:
     goarch:
       - amd64
       - arm64
-    main: ./cmd
+    main: ./cmd/nexus-v
     binary: nexus-v_{{ .Os }}_{{ .Arch }}
-
-archives:
-  - id: archive
-    ids:
-      - archive
-    formats:
-      - tar.gz
-    # use zip for windows archives
-    format_overrides:
-      - goos: windows
-        formats:
-          - zip
-    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
-    files:
-      - README.md
-      - LICENSE
-      - CHANGELOG.md
-
-checksum:
-  name_template: "checksums.txt"
-
-sboms:
-  - artifacts: archive
-    documents:
-      - "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}.sbom.json"
-
-snapshot:
-  version_template: "{{ .Tag }}-next"
-
-changelog:
-  sort: asc
-  filters:
-    exclude:
-      - "^docs:"
-      - "^test:"
-
-brews:
-  - name: nexus-v
-    repository:
-      owner: stillsystems
-      name: homebrew-nexusv
-      token: "{{ .Env.GORELEASER_TOKEN }}"
-    directory: Formula
-    homepage: "https://github.com/stillsystems/nexus-v"
-    description: "A modern VS Code extension scaffolder with zero runtime dependencies."
-    license: "MIT"
-    ids:
-      - archive
-    install: |
-      bin.install "nexus-v"
-
-scoops:
-  - name: nexus-v
-    repository:
-      owner: stillsystems
-      name: scoop-bucket
-      token: "{{ .Env.GORELEASER_TOKEN }}"
-    homepage: "https://github.com/stillsystems/nexus-v"
-    description: "A modern VS Code extension scaffolder with zero runtime dependencies."
-    license: "MIT"
-    ids:
-      - archive
-
-winget:
-  - name: nexus-v
-    publisher: Still Systems
-    package_identifier: stillsystems.nexusv
-    short_description: "A modern VS Code extension scaffolder with zero runtime dependencies."
-    description: "NEXUS-V replaces the legacy Yeoman generator with a single static binary that produces clean VS Code extension projects."
-    license: MIT
-    homepage: "https://github.com/stillsystems/nexus-v"
-    publisher_url: "https://github.com/stillsystems"
-    tags:
-      - vscode
-      - extension
-      - yeoman
-      - scaffolder
-    repository:
-      owner: stillsystems
-      name: winget-nexusv
-      token: "{{ .Env.GORELEASER_TOKEN }}"
-    ids:
-      - archive
-
-release:
-  github:
-    owner: stillsystems
-  draft: true
