@@ -29,6 +29,23 @@ func (e *SimpleAIEngine) GenerateTemplate(prompt string) (*TemplateMetadata, err
 		meta.Features = append(meta.Features, Feature{ID: "cli", Name: "CLI Support"})
 	}
 	
+	if strings.Contains(prompt, "typescript") || strings.Contains(prompt, "ts") {
+		meta.Language = "TypeScript"
+		meta.Features = append(meta.Features, Feature{ID: "strict", Name: "Strict Type Checking"})
+	}
+
+	if strings.Contains(prompt, "react") {
+		meta.Features = append(meta.Features, Feature{ID: "react", Name: "React Framework"})
+	}
+
+	if strings.Contains(prompt, "nextjs") || strings.Contains(prompt, "next.js") {
+		meta.Features = append(meta.Features, Feature{ID: "next", Name: "Next.js Framework"})
+	}
+
+	if strings.Contains(prompt, "docker") || strings.Contains(prompt, "container") {
+		meta.Features = append(meta.Features, Feature{ID: "docker", Name: "Docker Containerization"})
+	}
+
 	if strings.Contains(prompt, "python") {
 		meta.Language = "Python"
 		meta.Features = append(meta.Features, Feature{ID: "lint", Name: "Ruff Linting"})

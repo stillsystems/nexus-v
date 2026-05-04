@@ -27,17 +27,23 @@ Launch a premium, interactive web interface to browse templates and configure fe
 nexus-v serve
 ```
 
-### 🩺 Project Doctor
-Ensure your environment and project manifest are healthy and compliant with VS Code standards.
+### 🩺 Self-Healing Doctor
+Ensure your environment and project manifest are healthy. Automatically remediate common issues like missing build dependencies or incorrect manifest fields.
 ```bash
-nexus-v doctor
+nexus-v doctor --fix
+```
+
+### 🧠 AI Blueprint Generation
+Generate project blueprints from natural language prompts. Nexus-V uses intelligent heuristics (and upcoming LLM adapters) to scaffold the right features for your stack.
+```bash
+nexus-v generate "a nextjs project with tailwind and docker"
 ```
 
 ### 🧩 Conditional Scaffolding
 Define optional features and in-file logic in your templates. Nexus-V automatically handles file exclusion and dynamic content generation based on user selection.
 
 ### 🗂️ VS Code Integration
-Manage your projects directly from the VS Code Activity Bar with our native sidebar extension.
+Manage your projects directly from the VS Code Activity Bar with our native sidebar extension, featuring a glassmorphic visual interface.
 
 ## Installation / Quickstart
 
