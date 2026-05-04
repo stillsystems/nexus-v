@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
@@ -11,6 +12,7 @@ import (
 
 func runSearch(args []string) {
 	searchCmd := flag.NewFlagSet("search", flag.ExitOnError)
+	asJSON := searchCmd.Bool("json", false, "Output results as JSON")
 	searchCmd.Parse(args)
 
 	query := ""
@@ -29,6 +31,12 @@ func runSearch(args []string) {
 	}
 
 	results := reg.Search(query)
+	if *asJSON {
+		data, _ := json.MarshalIndent(results, "", "  ")
+		fmt.Println(string(data))
+		return
+	}
+
 	if len(results) == 0 {
 		Warn("No templates found matching '" + query + "'")
 		return
