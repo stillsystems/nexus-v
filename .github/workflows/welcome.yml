@@ -1,0 +1,13 @@
+name: Community Welcome
+on:
+  issues:
+    types: [opened]
+  pull_request:
+    types: [opened]
+
+jobs:
+  welcome:
+    uses: stillsystems/.github/.github/workflows/reusable-welcome.yml@main
+    permissions:
+      issues: write
+      pull-requests: write
