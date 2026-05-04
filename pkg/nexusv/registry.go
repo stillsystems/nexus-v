@@ -32,7 +32,7 @@ func FetchRegistry(url string) (*Registry, error) {
 	}
 
 	// Add Still Systems telemetry headers
-	req.Header.Set("User-Agent", "Nexus-V/0.2.8 (Still Systems)")
+	req.Header.Set("User-Agent", "github.com/stillsystems/nexus-v/0.2.8 (Still Systems)")
 	req.Header.Set("X-Nexus-Version", "0.2.8")
 
 	resp, err := client.Do(req)
@@ -81,3 +81,4 @@ func matchTags(tags []string, query string) bool {
 	}
 	return false
 }
+

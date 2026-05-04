@@ -11,9 +11,9 @@ import (
 	"strings"
 	"syscall"
 
-	"nexus-v/internal/prompts"
-	"nexus-v/internal/version"
-	"nexus-v/pkg/nexusv"
+	"github.com/stillsystems/nexus-v/internal/prompts"
+	"github.com/stillsystems/nexus-v/internal/version"
+	"github.com/stillsystems/nexus-v/pkg/nexusv"
 )
 
 func runInit(args []string) {
@@ -306,3 +306,4 @@ func firstNonEmpty(a, b string) string {
 	}
 	return b
 }
+

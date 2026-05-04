@@ -65,3 +65,4 @@ func GenerateFromPrompt(prompt string, engine AIEngine) (*TemplateMetadata, erro
 	}
 	return engine.GenerateTemplate(prompt)
 }
+

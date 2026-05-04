@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"nexus-v/pkg/nexusv"
+	"github.com/stillsystems/nexus-v/pkg/nexusv"
 )
 
 func runPublish(args []string) {
@@ -58,3 +58,4 @@ func runPublish(args []string) {
 	fmt.Println("\n-------------------------------------------")
 	fmt.Println("🚀 Thank you for contributing to the Still Systems ecosystem!")
 }
+

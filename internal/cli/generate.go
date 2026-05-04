@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"nexus-v/pkg/nexusv"
+	"github.com/stillsystems/nexus-v/pkg/nexusv"
 )
 
 func runGenerate(args []string) {
@@ -42,3 +42,4 @@ func runGenerate(args []string) {
 
 	fmt.Println("\n\U0001f680 Ready to scaffold. Run 'nexus-v init' to begin.")
 }
+

@@ -3,7 +3,7 @@ package cli
 import (
 	"fmt"
 	"os"
-	"nexus-v/pkg/nexusv"
+	"github.com/stillsystems/nexus-v/pkg/nexusv"
 )
 
 func runConfig(args []string) {
@@ -78,3 +78,4 @@ func runConfig(args []string) {
 		Error("Unknown action: " + action)
 	}
 }
+

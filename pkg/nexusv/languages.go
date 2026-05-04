@@ -51,3 +51,4 @@ func detectLanguage(dir string) string {
 	}
 	return ""
 }
+

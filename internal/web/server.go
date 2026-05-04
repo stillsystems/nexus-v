@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strings"
 
-	"nexus-v/pkg/nexusv"
+	"github.com/stillsystems/nexus-v/pkg/nexusv"
 )
 
 //go:embed static
@@ -106,3 +106,4 @@ func handleGenerate(w http.ResponseWriter, r *http.Request) {
 		"message": "Project generated at " + targetDir,
 	})
 }
+

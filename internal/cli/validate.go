@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"nexus-v/pkg/nexusv"
+	"github.com/stillsystems/nexus-v/pkg/nexusv"
 )
 
 func runValidate(args []string) {
@@ -43,3 +43,4 @@ func runValidate(args []string) {
 		fmt.Println("✅ Validation passed with warnings.")
 	}
 }
+

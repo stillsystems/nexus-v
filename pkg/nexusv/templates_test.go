@@ -122,3 +122,4 @@ func TestZipSlipPrevention(t *testing.T) {
 		t.Errorf("expected security violation error, got: %v", err)
 	}
 }
+

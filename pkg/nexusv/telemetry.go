@@ -51,3 +51,4 @@ func SendTelemetry(cfg Config, event, template string, version string) {
 		}
 	}()
 }
+

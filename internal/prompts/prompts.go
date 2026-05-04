@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"nexus-v/internal/tui"
-	"nexus-v/pkg/nexusv"
+	"github.com/stillsystems/nexus-v/internal/tui"
+	"github.com/stillsystems/nexus-v/pkg/nexusv"
 )
 
 type Answers struct {
@@ -110,3 +110,4 @@ func AskFeatures(meta *nexusv.TemplateMetadata) map[string]bool {
 
 	return enabled
 }
+

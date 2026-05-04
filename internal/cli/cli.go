@@ -5,8 +5,8 @@ import (
 	"os"
 	"runtime"
 
-	"nexus-v/internal/update"
-	"nexus-v/internal/version"
+	"github.com/stillsystems/nexus-v/internal/update"
+	"github.com/stillsystems/nexus-v/internal/version"
 )
 
 func Run() {
@@ -78,3 +78,4 @@ func printUsage() {
 	
 	fmt.Println("\nLearn more at: https://github.com/stillsystems/Nexus-V")
 }
+

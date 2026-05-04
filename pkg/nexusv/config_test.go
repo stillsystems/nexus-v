@@ -100,3 +100,4 @@ func TestConfigValidation(t *testing.T) {
 		t.Error("expected default variant to be set during validation")
 	}
 }
+

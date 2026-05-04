@@ -94,3 +94,4 @@ func TestRenderTemplate(t *testing.T) {
 		}
 	})
 }
+

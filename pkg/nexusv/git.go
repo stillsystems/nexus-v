@@ -67,3 +67,4 @@ func GitCloneWithRef(url, ref, dest string) error {
 
 	return nil
 }
+

@@ -4,7 +4,7 @@ import (
 	"flag"
 	"os"
 
-	"nexus-v/internal/web"
+	"github.com/stillsystems/nexus-v/internal/web"
 )
 
 func runServe(args []string) {
@@ -17,3 +17,4 @@ func runServe(args []string) {
 		os.Exit(1)
 	}
 }
+

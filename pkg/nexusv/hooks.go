@@ -28,3 +28,4 @@ func RunHooks(dir string, commands []string) error {
 
 	return nil
 }
+

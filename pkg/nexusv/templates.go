@@ -429,3 +429,4 @@ func GetAvailableTemplates() ([]AvailableTemplate, error) {
 	return result, nil
 }
 
+

@@ -59,3 +59,4 @@ func Install(pm PackageManager, cwd string) error {
 
 	return nil
 }
+

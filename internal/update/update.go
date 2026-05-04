@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"nexus-v/internal/version"
+	"github.com/stillsystems/nexus-v/internal/version"
 )
 
 var httpClient = &http.Client{
@@ -259,3 +259,4 @@ func applyUpdate(url, checksumURL, targetName string) error {
 
 	return nil
 }
+

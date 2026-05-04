@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"nexus-v/pkg/nexusv"
+	"github.com/stillsystems/nexus-v/pkg/nexusv"
 )
 
 func runDoctor(args []string) {
@@ -65,3 +65,4 @@ func runDoctor(args []string) {
 		os.Exit(1)
 	}
 }
+

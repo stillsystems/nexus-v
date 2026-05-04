@@ -185,3 +185,4 @@ func fixMissingManifestField(dir, field string) error {
 func GetSystemInfo() string {
 	return fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH)
 }
+

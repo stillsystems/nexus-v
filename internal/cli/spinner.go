@@ -42,3 +42,4 @@ func (s *Spinner) Stop() {
 	fmt.Print("\r\033[K")   // Clear line
 	fmt.Print("\033[?25h") // Show cursor
 }
+

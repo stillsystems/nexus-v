@@ -59,3 +59,4 @@ func TestGetSystemInfo(t *testing.T) {
 		t.Error("GetSystemInfo returned empty string")
 	}
 }
+

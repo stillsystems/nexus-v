@@ -102,3 +102,4 @@ func SelectVariant(variants []string) (string, error) {
 
 	return res, nil
 }
+

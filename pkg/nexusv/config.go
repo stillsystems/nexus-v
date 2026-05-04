@@ -122,3 +122,4 @@ func LoadConfig(targetDir string) (Config, error) {
 
 	return cfg, cfg.Validate()
 }
+

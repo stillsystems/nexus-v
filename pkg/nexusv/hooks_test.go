@@ -29,3 +29,4 @@ func TestRunHooks(t *testing.T) {
 		t.Error("RunHooks should have failed for nonexistent command")
 	}
 }
+

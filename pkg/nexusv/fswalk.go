@@ -20,3 +20,4 @@ func fsWalk(root string, fn func(path string, isDir bool) error) error {
 		return fn(path, d.IsDir())
 	})
 }
+

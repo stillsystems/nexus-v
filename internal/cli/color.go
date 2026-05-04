@@ -27,3 +27,4 @@ func Warn(msg string) {
 func Error(msg string) {
 	fmt.Println(Red + "✖ " + msg + Reset)
 }
+

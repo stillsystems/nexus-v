@@ -163,3 +163,4 @@ func ValidateTemplate(dir string) []ValidationResult {
 
 	return results
 }
+

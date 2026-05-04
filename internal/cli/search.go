@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"nexus-v/pkg/nexusv"
+	"github.com/stillsystems/nexus-v/pkg/nexusv"
 )
 
 func runSearch(args []string) {
@@ -58,3 +58,4 @@ func runSearch(args []string) {
 	fmt.Println()
 	Info("Use `nexus-v init --template <name>` to scaffold using one of these.")
 }
+

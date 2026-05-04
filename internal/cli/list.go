@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"nexus-v/pkg/nexusv"
+	"github.com/stillsystems/nexus-v/pkg/nexusv"
 )
 
 func runList(args []string) {
@@ -32,3 +32,4 @@ func runList(args []string) {
 		fmt.Println(" -", t)
 	}
 }
+

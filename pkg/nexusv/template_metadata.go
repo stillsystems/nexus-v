@@ -43,3 +43,4 @@ func LoadTemplateMetadata(dir string) (*TemplateMetadata, error) {
 
 	return &meta, nil
 }
+
