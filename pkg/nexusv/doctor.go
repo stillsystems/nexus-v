@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 // Issue represents a diagnostic finding.
@@ -15,6 +16,7 @@ type Issue struct {
 	Level   string // "Success", "Warning", "Error"
 	Message string
 	Fix     string
+	FixID   string
 }
 
 // DoctorResult contains the summary of a diagnostic run.
@@ -107,9 +109,53 @@ func checkProjectIntegrity(dir string, result *DoctorResult) {
 				Level:   "Warning",
 				Message: fmt.Sprintf("Missing vital field: %s", f),
 				Fix:     fmt.Sprintf("Add '%s' to package.json", f),
+				FixID:   "manifest_missing_" + f,
 			})
 		}
 	}
+}
+
+// FixIssue attempts to automatically repair a diagnosed issue.
+func FixIssue(dir string, issue Issue) error {
+	if strings.HasPrefix(issue.FixID, "manifest_missing_") {
+		field := strings.TrimPrefix(issue.FixID, "manifest_missing_")
+		return fixMissingManifestField(dir, field)
+	}
+	return fmt.Errorf("no automated fix available for %q", issue.FixID)
+}
+
+func fixMissingManifestField(dir, field string) error {
+	pkgPath := filepath.Join(dir, "package.json")
+	data, err := os.ReadFile(pkgPath)
+	if err != nil {
+		return err
+	}
+
+	var pkg map[string]interface{}
+	if err := json.Unmarshal(data, &pkg); err != nil {
+		return err
+	}
+
+	// Default values for missing vital fields
+	switch field {
+	case "name":
+		pkg["name"] = filepath.Base(dir)
+	case "publisher":
+		pkg["publisher"] = "stillsystems"
+	case "engines":
+		pkg["engines"] = map[string]string{"vscode": "^1.90.0"}
+	case "activationEvents":
+		pkg["activationEvents"] = []string{}
+	default:
+		return fmt.Errorf("don't know how to fix missing field %q", field)
+	}
+
+	newData, err := json.MarshalIndent(pkg, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(pkgPath, newData, 0o644)
 }
 
 // GetSystemInfo returns OS/Arch info.
